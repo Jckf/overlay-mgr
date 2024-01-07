@@ -1,0 +1,14 @@
+{
+  "name": "jckf/overlay-mgr",
+  "description": "Stream Overlay Manager",
+  "type": "project",
+  "autoload": {
+    "psr-4": {
+      "OverlayMgr\\": "./"
+    }
+  },
+  "require": {
+    "php": ">=8.2.0",
+    "ext-pdo": "*"
+  }
+}

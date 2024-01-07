@@ -1,0 +1,22 @@
+name: overlay-mgr
+version: 0.1-beta
+
+services:
+  nginx:
+    build:
+      context: ./
+      dockerfile: nginx.dockerfile
+    ports:
+      - "80:80"
+
+  php:
+    build:
+      context: ./
+      dockerfile: php.dockerfile
+
+  mysql:
+    build:
+      context: ./
+      dockerfile: mysql.dockerfile
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: "yes"
