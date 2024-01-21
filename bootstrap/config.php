@@ -1,6 +1,6 @@
 <?php
 
-use OverlayMgr\Repositories\MySqlRepository;
+use App\Repositories\MySqlRepository;
 
 $pdo = new PDO('mysql:host=mysql;port=3306;dbname=overlay-mgr', 'overlay-mgr', 'overlay-mgr');
 

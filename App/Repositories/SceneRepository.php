@@ -1,6 +1,6 @@
 <?php
 
-namespace OverlayMgr\Repositories;
+namespace App\Repositories;
 
 class SceneRepository extends MySqlRepository
 {

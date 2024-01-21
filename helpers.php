@@ -1,6 +1,6 @@
 <?php
 
-use OverlayMgr\Container;
+use App\Container;
 
 /**
  * @param string|null $class

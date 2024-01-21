@@ -2,34 +2,37 @@
 # BUILD STAGE      #
 ####################
 
-FROM ubuntu:23.10 AS build
+FROM php:8.2-fpm AS build
 
-RUN apt update && apt install -y php8.2-cli composer
+RUN docker-php-ext-install pdo pdo_mysql
 
+# Install Composer.
+COPY container-config/php/getcomposer.sh ./
+RUN ./getcomposer.sh && mv composer.phar /usr/local/bin/composer && rm getcomposer.sh
+
+# Move to project dir and drop root privileges.
 WORKDIR /var/www
-
 RUN chown -R www-data: .
-
-COPY composer.* ./
-
 USER www-data
 
-RUN composer install
+# Copy project files.
+COPY * ./
+
+####################
+# DEV STAGE        #
+####################
+
+FROM build AS dev
+
+COPY container-config/php/dev-entrypoint.sh /usr/local/bin/docker-dev-entrypoint
+
+ENTRYPOINT ["docker-dev-entrypoint"]
 
 ####################
 # PRODUCTION STAGE #
 ####################
 
-FROM php:8.2-fpm AS prod
+FROM env AS prod
 
-RUN docker-php-ext-install pdo pdo_mysql
-
-#COPY config/php.ini /etc/php/
-
-WORKDIR /var/www
-
-RUN chown -R www-data: .
-
-COPY src ./
-
-COPY --from=build /var/www/vendor /var/www/vendor
+# Install dependencies.
+RUN composer install --no-dev --no-interaction --optimize-autoloader

@@ -1,6 +1,6 @@
 <?php
 
-namespace OverlayMgr;
+namespace App;
 
 use ReflectionClass;
 use ReflectionException;
@@ -95,10 +95,11 @@ class Container
     /**
      * @param string $class
      * @param object $instance
+     * @return object
      */
     public function bind(string $class, object $instance)
     {
-        $this->instances[$class] = $instance;
+        return $this->instances[$class] = $instance;
     }
 
     /**
