@@ -1,1 +1,272 @@
-<!-- Nothing here. -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Check out these items!</title>
+	<style>
+		* {
+			margin: 0px;
+			padding: 0px;
+		}
+
+		.appContainer {
+			display:grid;
+			grid-template-areas: "mainContent";
+			grid-template-columns:100vw;
+			grid-template-rows:100vh;
+		}
+		.appContainer nav {
+			background-color: #3f3;
+			grid-template: nav;
+			display:none;
+		}
+		.appContainer main {
+			grid-template: mainContent;
+			display:flex;
+			flex-flow: row;
+			flex-wrap: wrap;
+			background-color: rgb(255, 109, 236);
+		}
+		.itemCard {
+			margin:1em;
+			display:grid;
+			grid-template-areas: "picture"
+				"title"
+				"history";
+			grid-template-rows: 90% 5% 5%;
+			min-width:400px;
+			height: 556px;
+			width:400px;
+			color:#fff;
+			overflow:hidden;
+			border-radius: 50px;
+			box-shadow: 0px 0px 5px 5px  rgba(40,40,40,0.7);
+		}
+		.itemCard button {
+			z-index: 200;
+			margin: 2em;
+			padding: 1em;
+			position: relative;
+		}
+		.itemCard .pictureBid {
+			grid-area:picture;
+		}
+		.itemCard h3 {
+			grid-area:title;
+			background-color: rgba(40,40,40,0.7);
+			text-align:center;
+			padding-bottom:0.7em;
+		}
+		.itemCard .bidHistoryContainer {
+			grid-area:history;
+			text-align:center;
+			background-color: rgba(40,40,40,0.7);
+		}
+		.itemCard img {
+			display: block;
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			height: 100%;
+			width: 100%; 
+			transform: translate(-50%, -50%);
+			/* Source for image translation: https://stackoverflow.com/a/19193308 */
+		}
+		.itemCard .collapsed {
+			display:none;
+		}
+		.itemCard .pictureBid {
+			position:relative;
+			width:400px;
+			height:500px;
+			display: inline-block;
+			overflow: hidden;
+		}
+		.itemCard .bid {
+			position: absolute;
+			z-index: 200;
+			text-align: center;
+			font-size: 4em;
+			color:#fff;
+			width: 100%;
+			bottom: 0px;
+			background-color: rgba(40,40,40,0.7);
+		}
+		::backdrop {
+			background-image: radial-gradient(
+				rebeccapurple,
+				pink
+			);
+			opacity: 0.75;
+		}
+		dialog#bidModal, dialog#bidHistoryModal {
+			position: absolute;
+			left:	33%;
+			right:	33%;
+			top:	25%;
+			height: 33%;
+			width:	33%;
+			overflow: hidden;
+			border-radius: 50px;
+			box-shadow: 0px 0px 5px 5px  rgba(40,40,40,0.7);
+			padding-left: 1.5em;
+  			padding-right: 1.5em;
+			padding-top: 1em;
+			border:0px;
+		}
+		dialog button#bidInfoModalClose, dialog button#bidHistoryModalClose {
+			font-size: 1.5em;
+			float: right;
+			border: 0px;
+			background-color: rgba(0,0,0,0);
+			cursor: pointer;
+		}
+		.smsTemplate {
+			color:#000;
+			font-weight:bold;
+		}
+		#bidMessage {
+			margin-top:1em;
+			font-size: 1.5em;
+		}
+	</style>
+</head>
+<template id="bidHistoryInfoTemplate">
+	<div class="bidHistoryInfoCard">
+		<span class="bidTime"></span>: <span class="bidMoney"></span>
+	</div>
+</template>
+<template id="itemCard">
+	<div class="itemCard">
+		<section class="pictureBid">
+			<button>Gi Bud</button>
+			<img src="" alt="${title}" style="width:auto;">
+			<div class="bid">
+				${bid}
+			</div>
+		</section>
+		<h3>
+			${title}
+		</h3>
+		<div class="bidHistoryContainer">
+			<a>Vis Bud-Historikk</a>
+			<section class="collapsed">
+				
+			</section>
+		</div>
+	</div>
+</template>
+<dialog id="bidModal">
+	<form method="dialog">
+		<button autofocus id="bidInfoModalClose">❌</button>
+	</form>
+	<h1>By på"<span id="bidItem"></span>"</h1>
+	<div id="bidMessage">
+		Send SMS med kodeord <br><span class="smsTemplate">BUD <span id="bidMessageItemID"></span> <span id="minBid">[ditt bud]</span></span>
+	</div>
+</dialog>
+<dialog id="bidHistoryModal">
+	<form method="dialog">
+		<button autofocus id="bidHistoryModalClose">❌</button>
+	</form>
+	<h1>Budhistorikk</h1>
+	<div id="bidHistoryMessages">
+		
+	</div>
+</dialog>
+<body class="appContainer">
+	<nav>
+		<h4>Navigation</h4>
+		<a href="#">This is a test</a>
+	</nav>
+	<main>
+
+	</main>
+	<script>
+		const template = document.querySelector("#itemCard");
+		const bidHistoryModal = document.querySelector("#bidHistoryModal");
+		const bidHistoryInfoTemplate = document.querySelector("#bidHistoryInfoTemplate");
+		const marketplaceTarget = document.querySelector(".appContainer main");
+		const bidInfoModal = document.querySelector("dialog#bidModal");
+		const bidHistoryMessages = bidHistoryModal.querySelector("#bidHistoryMessages");
+	
+
+		fetch(`/api/items`)
+		.then((body) => {
+			populateSite(body);
+		})
+		.catch(()=>{
+			setTimeout(()=>{document.location.reload()}, 5000);
+		});
+
+		mockedJson = {
+			items: {
+				"vase": {
+					key: "vase",
+					picture: "/static/img/MingVase.webp",
+					title: "300 bc vase, china",
+					currentBid: 20013,
+					bidOwner: 46611779,
+					bidHistory: [
+						{"time": 1707582028325, "bid":20013},
+						{"time": 1707582026313, "bid":15321}
+					]
+				},
+				"stearinlys": {
+					key: "stearinlys",
+					picture: "/static/img/BundleOfCandles.webp",
+					title: "Ancient bundle of candles, lightly used",
+					currentBid: 1542,
+					bidOwner: 46611779,
+					bidHistory: [
+						{"time": 1707582028325, "bid":1542},
+						{"time": 1707582026313, "bid":1321}
+					]
+				}
+			}
+		}
+	
+		const populateSite = (auctionInventory) => {
+			auctionInventory.forEach(element => {
+				let clone = template.content.cloneNode(true);
+
+				clone.querySelector("h3").textContent  =	element.title;
+				clone.querySelector(".bid").textContent =	element.currentBid;
+				clone.querySelector("img").src =			element.picture;
+				clone.querySelector("img").alt =			element.title.replace(`"`,`\"`);
+				
+				let button = clone.querySelector("button");
+				button.addEventListener('click', (event) => {
+					bidInfoModal.querySelector("#bidItem").textContent = `${element.title}`;
+					bidInfoModal.querySelector("#bidMessage #bidMessageItemID").textContent = `${element.key}`
+					bidInfoModal.showModal();
+				});
+				
+				const bidHistory = clone.querySelector(".bidHistoryContainer a");
+
+				bidHistory.addEventListener('click', (event) => {
+					let history = element.bidHistory;
+
+					bidHistoryMessages.innerHTML = "";
+
+					history.forEach(historyItem => {
+						let historyClone = bidHistoryInfoTemplate.content.cloneNode(true);
+						let humanReadableDate = new Date(historyItem.time).toDateString();
+						//let humanReadableDate = new Date(element.time).toUTCString();
+
+						historyClone.querySelector(".bidHistoryInfoCard .bidTime").textContent = `${humanReadableDate}`;
+						historyClone.querySelector(".bidHistoryInfoCard .bidMoney").textContent = `${historyItem.bid} NOK`;
+
+
+						bidHistoryMessages.appendChild(historyClone);
+					});
+
+					bidHistoryModal.showModal();
+				});
+				marketplaceTarget.appendChild(clone);
+			});
+		}
+	</script>
+</body>
+</html>
