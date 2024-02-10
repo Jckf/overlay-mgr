@@ -13,6 +13,9 @@ services:
     ports:
       - "80:80"
 
+    volumes:
+        - ./static:/var/www/static
+
   ####################
   # App server       #
   ####################
