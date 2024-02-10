@@ -187,9 +187,10 @@ class Request
 
     /**
      * @param string|null $key
-     * @return mixed|null
+     * @param mixed|null $default
+     * @return mixed
      */
-    public function get(string $key = null)
+    public function get(string $key = null, mixed $default = null): mixed
     {
         if (!$this->get && $this->query) {
             $this->populateGet();
@@ -199,7 +200,7 @@ class Request
             return $this->get;
         }
 
-        return $this->get[$key] ?? null;
+        return $this->get[$key] ?? $default;
     }
 
     protected function populatePost(): void
@@ -211,9 +212,10 @@ class Request
 
     /**
      * @param string|null $key
-     * @return mixed|null
+     * @param mixed|null $default
+     * @return mixed
      */
-    public function post(string $key = null)
+    public function post(string $key = null, mixed $default = null): mixed
     {
         if (!$this->post && $this->body) {
             $this->populatePost();
@@ -223,6 +225,16 @@ class Request
             return $this->post;
         }
 
-        return $this->post[$key] ?? null;
+        return $this->post[$key] ?? $default;
+    }
+
+    /**
+     * @param string $key
+     * @param mixed|null $default
+     * @return mixed
+     */
+    public function input(string $key, mixed $default = null): mixed
+    {
+        return $this->post($key) ?? $this->get($key) ?? $default;
     }
 }

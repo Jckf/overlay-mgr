@@ -2,18 +2,32 @@
 
 namespace App;
 
+use App\Controllers\Controller;
 use App\Exceptions\HttpException;
+use Exception;
 
 class Router
 {
+    /** @var array */
     protected array $routes = [];
 
-    public function bind(string $method, string $pattern, callable $handler)
+    /** @var array<class-string, Controller> */
+    protected array $controllers = [];
+
+    public function bind(string $method, string $pattern, $handler)
     {
         $method = strtolower($method);
 
         if (!array_key_exists($pattern, $this->routes)) {
             $this->routes[$pattern] = [];
+        }
+
+        if (is_array($handler) && is_string($handler[0])) {
+            $handler[0] = $this->controllers[$handler[0]] ?? $this->controllers[$handler[0]] = container($handler[0]);
+        }
+
+        if (!is_callable($handler)) {
+            throw new Exception('Handler must be callable.');
         }
 
         $this->routes[$pattern][$method] = $handler;
