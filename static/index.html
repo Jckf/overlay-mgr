@@ -198,9 +198,9 @@
 		fetch(`/api/items/`)
 		.then(r => r.json())
 		.then(items => populateSite(items))
-		/*.catch(()=>{
+		.catch(()=>{
 			setTimeout(()=>{document.location.reload()}, 5000);
-		});//*/
+		});
 
 		mockedJson = {
 			items: {
@@ -249,29 +249,42 @@
 
 				bidHistory.addEventListener('click', (event) => {
 					let history = element.bids;
+					fetch(`/api/items/${element.id}/bids/`)
+					.then(r => r.json())
+					.then(items => {
+						bidHistoryMessages.innerHTML = "";
+						if (items == undefined) {
+							let historyClone = document.createElement('div');
+							historyClone.textContent = 'Denne gjenstanden har ingen bud enda.';
+							bidHistoryMessages.appendChild(historyClone);
+							
+							bidHistoryModal.showModal();
+							return;
+						}
+						items.forEach(historyItem => {
+							let historyClone = bidHistoryInfoTemplate.content.cloneNode(true);
+							let humanReadableDate = new Date(historyItem.time).toDateString();
+							//let humanReadableDate = new Date(element.time).toUTCString();
 
-					bidHistoryMessages.innerHTML = "";
-					if (history == undefined) {
+							historyClone.querySelector(".bidHistoryInfoCard .bidTime").textContent = `${humanReadableDate}`;
+							historyClone.querySelector(".bidHistoryInfoCard .bidMoney").textContent = `${historyItem.bid} NOK`;
+
+
+							bidHistoryMessages.appendChild(historyClone);
+						});
+
+						bidHistoryModal.showModal();
+					})
+					.catch(()=>{
+						bidHistoryMessages.innerHTML = "";
 						let historyClone = document.createElement('div');
 						historyClone.textContent = 'Denne gjenstanden har ingen bud enda.';
 						bidHistoryMessages.appendChild(historyClone);
 						
 						bidHistoryModal.showModal();
-						return;
-					}
-					history.forEach(historyItem => {
-						let historyClone = bidHistoryInfoTemplate.content.cloneNode(true);
-						let humanReadableDate = new Date(historyItem.time).toDateString();
-						//let humanReadableDate = new Date(element.time).toUTCString();
-
-						historyClone.querySelector(".bidHistoryInfoCard .bidTime").textContent = `${humanReadableDate}`;
-						historyClone.querySelector(".bidHistoryInfoCard .bidMoney").textContent = `${historyItem.bid} NOK`;
-
-
-						bidHistoryMessages.appendChild(historyClone);
 					});
 
-					bidHistoryModal.showModal();
+					
 				});
 				marketplaceTarget.appendChild(clone);
 			});
