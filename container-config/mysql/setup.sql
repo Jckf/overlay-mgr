@@ -27,6 +27,6 @@ CREATE TABLE `bids` (
     FOREIGN KEY (`item_id`) REFERENCES `items`(`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
-INSERT INTO `items` (`key`, `title`, `description`, `image`) VALUES ('vase', 'Ming Vase', 'A beautiful Ming Vase.', '/static/img/vase.jpg');
-INSERT INTO `items` (`key`, `title`, `description`, `image`) VALUES ('candles', 'Ancient Candles', 'An ancient bundle of candles.', '/static/img/candles.jpg');
-INSERT INTO `items` (`key`, `title`, `description`, `image`) VALUES ('f40', 'Ferrari F40', 'The Ferrari of Ferraris.', '/static/img/ferrari.jpg');
+INSERT INTO `items` (`key`, `title`, `description`, `image`) VALUES ('vase', 'Ming Vase', 'A beautiful Ming Vase.', '/static/img/vase.webp');
+INSERT INTO `items` (`key`, `title`, `description`, `image`) VALUES ('candles', 'Ancient Candles', 'An ancient bundle of candles.', '/static/img/candles.webp');
+INSERT INTO `items` (`key`, `title`, `description`, `image`) VALUES ('f40', 'Ferrari F40', 'The Ferrari of Ferraris.', '/static/img/ferrari.webp');
