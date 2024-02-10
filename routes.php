@@ -1,5 +1,6 @@
 <?php
 
+use App\Controllers\ItemBidController;
 use App\Controllers\ItemController;
 use App\Controllers\SmsController;
 use App\Request;
@@ -17,4 +18,7 @@ $router->bind('get', '/^\/api\/sms\/incoming$/', [ SmsController::class, 'incomi
 
 // Items
 $router->bind('get', '/^\/api\/items\/$/', [ ItemController::class, 'index' ]);
-$router->bind('get', '/^\/api\/items\/(.+)$/', [ ItemController::class, 'get' ]);
+$router->bind('get', '/^\/api\/items\/([0-9]+)$/', [ ItemController::class, 'get' ]);
+
+// Item bids
+$router->bind('get', '/^\/api\/items\/([0-9]+)\/bids\/$/', [ ItemBidController::class, 'bidIndex' ]);

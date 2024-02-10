@@ -24,6 +24,9 @@ class MySqlRepository implements Repository
     /** @var class-string<Entity> */
     protected string $entityClass;
 
+    /** @var array */
+    protected array $constraints = [];
+
     /**
      * @return PDO
      */
@@ -110,7 +113,9 @@ class MySqlRepository implements Repository
         $primaryKey = $entity->getPrimaryKeyName();
         $primaryKeyColumn = snake_case($primaryKey);
 
-        $statement = $this->getPdo()->prepare("DELETE FROM {$this->table} WHERE {$primaryKeyColumn} = :{$primaryKey}");
+        $constraintsString = $this->constraintsToSql();
+
+        $statement = $this->getPdo()->prepare("DELETE FROM {$this->table} WHERE {$primaryKeyColumn} = :{$primaryKey}" . ($constraintsString ? " AND {$constraintsString}" : ''));
         return $statement->execute([
             ':' . $primaryKey => $entity->getAttribute($primaryKey),
         ]);
@@ -125,7 +130,9 @@ class MySqlRepository implements Repository
     {
         $offset = ($page - 1) * $perPage;
 
-        $statement = $this->getPdo()->prepare("SELECT * FROM {$this->table} LIMIT :limit OFFSET :offset");
+        $constraintsString = $this->constraintsToSql();
+
+        $statement = $this->getPdo()->prepare("SELECT * FROM {$this->table}" . ($constraintsString ? " WHERE {$constraintsString}" : '') . " LIMIT :limit OFFSET :offset");
         $statement->bindParam(':limit', $perPage, PDO::PARAM_INT);
         $statement->bindParam(':offset', $offset, PDO::PARAM_INT);
         $statement->execute();
@@ -142,11 +149,47 @@ class MySqlRepository implements Repository
         $primaryKey = (new $this->entityClass())->getPrimaryKeyName();
         $primaryKeyColumn = snake_case($primaryKey);
 
-        $statement = $this->getPdo()->prepare("SELECT * FROM {$this->table} WHERE {$primaryKeyColumn} = :{$primaryKey}");
+        $constraintsString = $this->constraintsToSql();
+
+        $statement = $this->getPdo()->prepare("SELECT * FROM {$this->table} WHERE {$primaryKeyColumn} = :{$primaryKey}" . ($constraintsString ? " AND {$constraintsString}" : ''));
         $statement->execute([
             ':' . $primaryKey => $id,
         ]);
 
         return $statement->fetchObject($this->entityClass);
+    }
+
+    /**
+     * @param string $attribute
+     * @param string $operator
+     * @param mixed $value
+     * @deprecated Constraints are vulnerable to SQL injection attacks.
+     */
+    public function constrain(string $attribute, string $operator, mixed $value): void
+    {
+        $this->constraints[] = [
+            'attribute' => $attribute,
+            'operator' => $operator,
+            'value' => $value,
+        ];
+    }
+
+    /**
+     * @return string
+     */
+    protected function constraintsToSql(): string
+    {
+        $sql = [];
+
+        foreach ($this->constraints as $constraint) {
+            $sql[] = sprintf(
+                '%s %s %s',
+                snake_case($constraint['attribute']),
+                $constraint['operator'],
+                $constraint['value'],
+            );
+        }
+
+        return implode(' AND ', $sql);
     }
 }

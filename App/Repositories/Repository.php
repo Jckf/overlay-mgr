@@ -30,4 +30,11 @@ interface Repository
      * @return Entity|null
      */
     public function find(int $id): ?Entity;
+
+    /**
+     * @param string $attribute
+     * @param string $operator
+     * @param mixed $value
+     */
+    public function constrain(string $attribute, string $operator, mixed $value): void;
 }

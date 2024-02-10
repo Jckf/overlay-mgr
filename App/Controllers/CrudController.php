@@ -24,6 +24,11 @@ abstract class CrudController extends Controller
 
     public function get(Request $request, int $id): void
     {
+        header('Content-Type: application/json');
 
+        echo json_encode(
+            $this->repository->find($id),
+            JSON_PRETTY_PRINT
+        );
     }
 }

@@ -11,6 +11,8 @@ namespace App\Entities;
  * @method $this setSender(string $sender)
  * @method string getOriginalMessage()
  * @method $this setOriginalMessage(string $originalMessage)
+ * @method int getItemId()
+ * @method $this setItemId(int $itemId)
  * @method int getAmount()
  * @method $this setAmount(int $amount)
  * @method int getTimestamp()
@@ -31,8 +33,25 @@ class Bid extends Entity
     protected ?string $originalMessage = null;
 
     /** @var int|null */
+    protected ?int $itemId = null;
+
+    /** @var int|null */
     protected ?int $amount = null;
 
     /** @var int|null */
     protected ?int $timestamp = null;
+
+    public function jsonSerialize(): array
+    {
+        $len = strlen($this->getSender());
+        $asterisks = $len - 3;
+
+        return [
+            'id' => $this->getId(),
+            'sender' => str_repeat('*', $asterisks) . substr($this->getSender(), -3),
+            'itemId' => $this->getItemId(),
+            'amount' => $this->getAmount(),
+            'timestamp' => $this->getTimestamp(),
+        ];
+    }
 }
