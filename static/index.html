@@ -137,7 +137,7 @@
 </head>
 <template id="bidHistoryInfoTemplate">
 	<div class="bidHistoryInfoCard">
-		<span class="bidTime"></span>: <span class="bidMoney"></span>
+		<span class="bidTime"></span> <span class="bidSender"></span>: <span class="bidMoney"></span>
 	</div>
 </template>
 <template id="itemCard">
@@ -263,11 +263,12 @@
 						}
 						items.forEach(historyItem => {
 							let historyClone = bidHistoryInfoTemplate.content.cloneNode(true);
-							let humanReadableDate = new Date(historyItem.time).toDateString();
-							//let humanReadableDate = new Date(element.time).toUTCString();
+							let humanReadableDate = new Date(historyItem.timestamp).toDateString();
+							//let humanReadableDate = new Date(element.timestamp).toUTCString();
 
 							historyClone.querySelector(".bidHistoryInfoCard .bidTime").textContent = `${humanReadableDate}`;
-							historyClone.querySelector(".bidHistoryInfoCard .bidMoney").textContent = `${historyItem.bid} NOK`;
+							historyClone.querySelector(".bidHistoryInfoCard .bidSender").textContent = `${historyItem.sender}`;
+							historyClone.querySelector(".bidHistoryInfoCard .bidMoney").textContent = `${historyItem.amount} NOK`;
 
 
 							bidHistoryMessages.appendChild(historyClone);
