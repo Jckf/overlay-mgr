@@ -192,13 +192,12 @@
 		const bidHistoryMessages = bidHistoryModal.querySelector("#bidHistoryMessages");
 	
 
-		fetch(`/api/items`)
-		.then((body) => {
-			populateSite(body);
-		})
-		.catch(()=>{
+		fetch(`/api/items/`)
+		.then(r => r.json())
+		.then(items => populateSite(items))
+		/*.catch(()=>{
 			setTimeout(()=>{document.location.reload()}, 5000);
-		});
+		});//*/
 
 		mockedJson = {
 			items: {
