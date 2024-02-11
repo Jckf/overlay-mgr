@@ -220,6 +220,7 @@
 		}
 	
 		const populateSite = (auctionInventory) => {
+			marketplaceTarget.innerHTML = "";
 			auctionInventory.forEach(element => {
 				let clone = template.content.cloneNode(true);
 
