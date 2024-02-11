@@ -13,6 +13,8 @@ namespace App\Entities;
  * @method $this setDescription(string $description)
  * @method string|null getImage()
  * @method $this setImage(string $image)
+ * @method int|null getCurrentBid()
+ * @method $this setCurrentBid(int $currentBid)
  */
 class Item extends Entity
 {
@@ -30,4 +32,7 @@ class Item extends Entity
 
     /** @var string|null */
     protected ?string $image = null;
+
+    /** @var int|null */
+    protected ?int $currentBid = null;
 }
