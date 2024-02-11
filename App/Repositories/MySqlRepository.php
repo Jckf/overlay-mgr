@@ -144,9 +144,9 @@ class MySqlRepository implements Repository
 
     /**
      * @param int $id
-     * @return Entity
+     * @return Entity|null
      */
-    public function find(int $id): Entity
+    public function find(int $id): ?Entity
     {
         $primaryKey = (new $this->entityClass())->getPrimaryKeyName();
         $primaryKeyColumn = snake_case($primaryKey);

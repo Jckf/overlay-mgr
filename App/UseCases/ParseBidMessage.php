@@ -24,7 +24,7 @@ class ParseBidMessage implements UseCase
         list($prefix, $itemKey, $bidValue) = explode(' ', trim($this->message), 3);
 
         return [
-            'item' => $itemKey,
+            'item_key' => $itemKey,
             'amount' => intval(trim($bidValue)),
         ];
     }

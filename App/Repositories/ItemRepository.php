@@ -35,18 +35,34 @@ class ItemRepository extends MySqlRepository
 
     /**
      * @param int $id
-     * @return Entity
+     * @return Entity|null
      */
-    public function find(int $id): Entity
+    public function find(int $id): ?Entity
     {
         $primaryKey = (new $this->entityClass())->getPrimaryKeyName();
         $primaryKeyColumn = snake_case($primaryKey);
 
         $constraintsString = $this->constraintsToSql();
 
-        $statement = $this->getPdo()->prepare("SELECT * FROM `{$this->table}`, `bids` WHERE {$primaryKeyColumn} = :{$primaryKey}" . ($constraintsString ? " AND {$constraintsString}" : ''));
+        $statement = $this->getPdo()->prepare("SELECT `{$this->table}`.*, MAX(`bids`.`amount`) AS `current_bid` FROM `{$this->table}`, `bids` WHERE {$primaryKeyColumn} = :{$primaryKey}" . ($constraintsString ? " AND {$constraintsString}" : '') . " GROUP BY `{$this->table}`.`id`");
         $statement->execute([
             ':' . $primaryKey => $id,
+        ]);
+
+        return $statement->fetchObject($this->entityClass);
+    }
+
+    /**
+     * @param string $key
+     * @return Entity|null
+     */
+    public function findByKey(string $key): ?Entity
+    {
+        $constraintsString = $this->constraintsToSql();
+
+        $statement = $this->getPdo()->prepare("SELECT `{$this->table}`.*, MAX(`bids`.`amount`) AS `current_bid` FROM `{$this->table}`, `bids` WHERE `key` = :key" . ($constraintsString ? " AND {$constraintsString}" : '') . " GROUP BY `{$this->table}`.`id`");
+        $statement->execute([
+            ':key' => $key,
         ]);
 
         return $statement->fetchObject($this->entityClass);

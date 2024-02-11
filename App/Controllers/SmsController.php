@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Entities\Bid;
 use App\Repositories\BidRepository;
+use App\Repositories\ItemRepository;
 use App\Request;
 use App\UseCases\ParseBidMessage;
 use Exception;
@@ -24,7 +25,12 @@ class SmsController extends Controller
 
         $bid->setAmount($bidMeta['amount']);
 
-        // TODO: Find the item this bid is for.
+        /** @var ItemRepository $itemRepo */
+        $itemRepo = container(ItemRepository::class);
+
+        if ($item = $itemRepo->findByKey($bidMeta['item_key'])) {
+            $bid->setItemId($item->getId());
+        }
 
         /** @var BidRepository $bidRepo */
         $bidRepo = container(BidRepository::class);

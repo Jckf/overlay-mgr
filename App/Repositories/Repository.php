@@ -21,6 +21,8 @@ interface Repository
     /**
      * @param int $page
      * @param int $perPage
+     * @param string $orderBy
+     * @param string $direction
      * @return Entity[]
      */
     public function page(int $page, int $perPage, string $orderBy = 'id', string $direction = 'asc'): array;
