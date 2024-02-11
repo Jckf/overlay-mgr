@@ -243,7 +243,7 @@
 					.then(r => r.json())
 					.then(items => {
 						bidHistoryMessages.innerHTML = "";
-						if (items == undefined) {
+						if (items == undefined || items.length == 0) {
 							let historyClone = document.createElement('div');
 							historyClone.textContent = 'Denne gjenstanden har ingen bud enda.';
 							bidHistoryMessages.appendChild(historyClone);
