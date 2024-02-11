@@ -23,7 +23,7 @@ interface Repository
      * @param int $perPage
      * @return Entity[]
      */
-    public function page(int $page, int $perPage): array;
+    public function page(int $page, int $perPage, string $orderBy = 'id', string $direction = 'asc'): array;
 
     /**
      * @param int $id

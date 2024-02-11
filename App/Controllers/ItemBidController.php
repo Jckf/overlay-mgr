@@ -16,6 +16,15 @@ class ItemBidController extends CrudController
     {
         $this->repository->constrain('itemId', '=', $itemId);
 
-        parent::index($request);
+        header('Content-Type: application/json');
+
+        echo json_encode(
+            $this->repository->page(
+                $request->get('page', 1),
+                $request->get('limit', 10),
+                'amount',
+            ),
+            JSON_PRETTY_PRINT
+        );
     }
 }

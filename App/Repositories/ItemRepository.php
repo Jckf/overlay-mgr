@@ -15,9 +15,11 @@ class ItemRepository extends MySqlRepository
     /**
      * @param int $page
      * @param int $perPage
+     * @param string $orderBy
+     * @param string $direction
      * @return Entity[]
      */
-    public function page(int $page, int $perPage): array
+    public function page(int $page, int $perPage, string $orderBy = 'id', string $direction = 'desc'): array
     {
         $offset = ($page - 1) * $perPage;
 

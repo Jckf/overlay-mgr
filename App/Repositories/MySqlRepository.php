@@ -124,15 +124,17 @@ class MySqlRepository implements Repository
     /**
      * @param int $page
      * @param int $perPage
+     * @param string $orderBy
+     * @param string $direction
      * @return Entity[]
      */
-    public function page(int $page, int $perPage): array
+    public function page(int $page, int $perPage, string $orderBy = 'id', string $direction = 'desc'): array
     {
         $offset = ($page - 1) * $perPage;
 
         $constraintsString = $this->constraintsToSql();
 
-        $statement = $this->getPdo()->prepare("SELECT * FROM {$this->table}" . ($constraintsString ? " WHERE {$constraintsString}" : '') . " LIMIT :limit OFFSET :offset");
+        $statement = $this->getPdo()->prepare("SELECT * FROM {$this->table}" . ($constraintsString ? " WHERE {$constraintsString}" : '') . " ORDER BY `{$orderBy}` {$direction} LIMIT :limit OFFSET :offset");
         $statement->bindParam(':limit', $perPage, PDO::PARAM_INT);
         $statement->bindParam(':offset', $offset, PDO::PARAM_INT);
         $statement->execute();
