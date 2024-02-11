@@ -224,7 +224,7 @@
 				let clone = template.content.cloneNode(true);
 
 				clone.querySelector("h3").textContent  =	element.title;
-				clone.querySelector(".bid").textContent =	element?.currentBid;
+				clone.querySelector(".bid").textContent =	(element.currentBid != null) ? `${element.currentBid},-`: '';
 				clone.querySelector("img").src =			element.image;
 				clone.querySelector("img").alt =			element.title.replace(`"`,`\"`);
 				
