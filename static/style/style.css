@@ -1,0 +1,142 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+html,
+body {
+    min-width: 100vw;
+    min-height: 100vh;
+}
+
+.appContainer {
+    display: grid;
+    grid-template-areas: "mainContent";
+    grid-template-columns: 100vw;
+    grid-template-rows: 100vh;
+}
+
+.appContainer main {
+    grid-template: "mainContent";
+    display: flex;
+    flex-flow: row;
+    flex-wrap: wrap;
+    background-color: rgb(255, 109, 236);
+}
+
+.itemCard {
+    margin: 1em;
+    display: grid;
+    grid-template-areas:
+        "picture"
+        "title"
+        "history";
+    grid-template-rows: 90% 5% 5%;
+    min-width:400px;
+    height: 556px;
+    width: 400px;
+    color: #fff;
+    overflow: hidden;
+    border-radius: 50px;
+    box-shadow: 0 0 5px 5px  rgba(40, 40, 40, 0.7);
+}
+
+.itemCard button {
+    z-index: 200;
+    margin: 2em;
+    padding: 1em;
+    position: relative;
+}
+
+.itemCard .pictureBid {
+    grid-area: picture;
+}
+
+.itemCard h3 {
+    grid-area: title;
+    background-color: rgba(40, 40, 40, 0.7);
+    text-align: center;
+    padding-bottom: 0.7em;
+}
+
+.itemCard .bidHistoryContainer {
+    grid-area: history;
+    text-align: center;
+    background-color: rgba(40, 40, 40, 0.7);
+}
+
+.itemCard .bidHistoryContainer .showBids {
+    cursor: pointer
+}
+
+.itemCard img {
+    display: block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    height: 100%;
+    width: 100%;
+    transform: translate(-50%, -50%);
+}
+
+.itemCard .collapsed {
+    display: none;
+}
+
+.itemCard .pictureBid {
+    position: relative;
+    width: 400px;
+    height: 500px;
+    display: inline-block;
+    overflow: hidden;
+}
+
+.itemCard .bid {
+    position: absolute;
+    z-index: 200;
+    text-align: center;
+    font-size: 4em;
+    color: #fff;
+    width: 100%;
+    bottom: 0;
+    background-color: rgba(40, 40, 40, 0.7);
+}
+
+::backdrop {
+    background-image: radial-gradient(rebeccapurple, pink);
+    opacity: 0.75;
+}
+
+dialog#bidModal, dialog#bidHistoryModal {
+    position: absolute;
+    left: 33%;
+    right: 33%;
+    top: 25%;
+    height: 33%;
+    width: 33%;
+    overflow: hidden;
+    border-radius: 50px;
+    box-shadow: 0 0 5px 5px  rgba(40, 40, 40, 0.7);
+    padding-left: 1.5em;
+    padding-right: 1.5em;
+    padding-top: 1em;
+    border: 0;
+}
+
+dialog button#bidInfoModalClose, dialog button#bidHistoryModalClose {
+    font-size: 1.5em;
+    float: right;
+    border: 0;
+    background-color: rgba(0, 0, 0, 0);
+    cursor: pointer;
+}
+
+.smsTemplate {
+    color: #000;
+    font-weight: bold;
+}
+
+#bidMessage, #bidHistoryMessages {
+    margin-top: 1em;
+    font-size: 1.5em;
+}

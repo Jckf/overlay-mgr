@@ -1,286 +1,70 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Check out these items!</title>
-	<style>
-		* {
-			margin: 0px;
-			padding: 0px;
-		}
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-		.appContainer {
-			display:grid;
-			grid-template-areas: "mainContent";
-			grid-template-columns:100vw;
-			grid-template-rows:100vh;
-		}
-		.appContainer nav {
-			background-color: #3f3;
-			grid-template: nav;
-			display:none;
-		}
-		.appContainer main {
-			grid-template: mainContent;
-			display:flex;
-			flex-flow: row;
-			flex-wrap: wrap;
-			background-color: rgb(255, 109, 236);
-		}
-		.itemCard {
-			margin:1em;
-			display:grid;
-			grid-template-areas: "picture"
-				"title"
-				"history";
-			grid-template-rows: 90% 5% 5%;
-			min-width:400px;
-			height: 556px;
-			width:400px;
-			color:#fff;
-			overflow:hidden;
-			border-radius: 50px;
-			box-shadow: 0px 0px 5px 5px  rgba(40,40,40,0.7);
-		}
-		.itemCard button {
-			z-index: 200;
-			margin: 2em;
-			padding: 1em;
-			position: relative;
-		}
-		.itemCard .pictureBid {
-			grid-area:picture;
-		}
-		.itemCard h3 {
-			grid-area:title;
-			background-color: rgba(40,40,40,0.7);
-			text-align:center;
-			padding-bottom:0.7em;
-		}
-		.itemCard .bidHistoryContainer {
-			grid-area:history;
-			text-align:center;
-			background-color: rgba(40,40,40,0.7);
-		}
-		.itemCard .bidHistoryContainer .showBids {
-			cursor:pointer
-		}
-		.itemCard img {
-			display: block;
-			position: absolute;
-			top: 50%;
-			left: 50%;
-			height: 100%;
-			width: 100%; 
-			transform: translate(-50%, -50%);
-			/* Source for image translation: https://stackoverflow.com/a/19193308 */
-		}
-		.itemCard .collapsed {
-			display:none;
-		}
-		.itemCard .pictureBid {
-			position:relative;
-			width:400px;
-			height:500px;
-			display: inline-block;
-			overflow: hidden;
-		}
-		.itemCard .bid {
-			position: absolute;
-			z-index: 200;
-			text-align: center;
-			font-size: 4em;
-			color:#fff;
-			width: 100%;
-			bottom: 0px;
-			background-color: rgba(40,40,40,0.7);
-		}
-		::backdrop {
-			background-image: radial-gradient(
-				rebeccapurple,
-				pink
-			);
-			opacity: 0.75;
-		}
-		dialog#bidModal, dialog#bidHistoryModal {
-			position: absolute;
-			left:	33%;
-			right:	33%;
-			top:	25%;
-			height: 33%;
-			width:	33%;
-			overflow: hidden;
-			border-radius: 50px;
-			box-shadow: 0px 0px 5px 5px  rgba(40,40,40,0.7);
-			padding-left: 1.5em;
-  			padding-right: 1.5em;
-			padding-top: 1em;
-			border:0px;
-		}
-		dialog button#bidInfoModalClose, dialog button#bidHistoryModalClose {
-			font-size: 1.5em;
-			float: right;
-			border: 0px;
-			background-color: rgba(0,0,0,0);
-			cursor: pointer;
-		}
-		.smsTemplate {
-			color:#000;
-			font-weight:bold;
-		}
-		#bidMessage, #bidHistoryMessages {
-			margin-top:1em;
-			font-size: 1.5em;
-		}
-	</style>
-</head>
-<template id="bidHistoryInfoTemplate">
-	<div class="bidHistoryInfoCard">
-		<span class="bidTime"></span> <span class="bidSender"></span>: <span class="bidMoney"></span>
-	</div>
-</template>
-<template id="itemCard">
-	<div class="itemCard">
-		<section class="pictureBid">
-			<button>Gi Bud</button>
-			<img src="" alt="${title}" style="width:auto;">
-			<div class="bid">
-				${bid}
+		<title>Auksjon - Kamp mot Kreft</title>
+
+		<link rel="stylesheet" href="style/style.css">
+	</head>
+	<body class="appContainer">
+		<main></main>
+
+		<template id="bidHistoryInfoTemplate">
+			<div class="bidHistoryInfoCard">
+				<span class="bidTime"></span> <span class="bidSender"></span>: <span class="bidMoney"></span>
 			</div>
-		</section>
-		<h3>
-			${title}
-		</h3>
-		<div class="bidHistoryContainer">
-			<a class="showBids">Vis Bud-Historikk</a>
-			<section class="collapsed">
-				
-			</section>
-		</div>
-	</div>
-</template>
-<dialog id="bidModal">
-	<form method="dialog">
-		<button autofocus id="bidInfoModalClose">❌</button>
-	</form>
-	<h1>By på"<span id="bidItem"></span>"</h1>
-	<div id="bidMessage">
-		Send SMS med kodeord <br><span class="smsTemplate">BUD <span id="bidMessageItemID"></span> <span id="minBid">[ditt bud]</span></span><br><br>Til 27333
-	</div>
-</dialog>
-<dialog id="bidHistoryModal">
-	<form method="dialog">
-		<button autofocus id="bidHistoryModalClose">❌</button>
-	</form>
-	<h1>Budhistorikk</h1>
-	<div id="bidHistoryMessages">
-		
-	</div>
-</dialog>
-<body class="appContainer">
-	<nav>
-		<h4>Navigation</h4>
-		<a href="#">This is a test</a>
-	</nav>
-	<main>
+		</template>
 
-	</main>
-	<script>
-		const template = document.querySelector("#itemCard");
-		const bidHistoryModal = document.querySelector("#bidHistoryModal");
-		const bidHistoryInfoTemplate = document.querySelector("#bidHistoryInfoTemplate");
-		const marketplaceTarget = document.querySelector(".appContainer main");
-		const bidInfoModal = document.querySelector("dialog#bidModal");
-		const bidHistoryMessages = bidHistoryModal.querySelector("#bidHistoryMessages");
-	
+		<template id="itemCard">
+			<div class="itemCard">
+				<section class="pictureBid">
+					<button>Gi Bud</button>
 
-		fetch(`/api/items/`)
-		.then(r => r.json())
-		.then(items => populateSite(items))
-		.catch(()=>{
-			setTimeout(()=>{document.location.reload()}, 5000);
-		});
+					<img src="" alt="${title}" style="width:auto;">
 
-		mockedJson = {
-			items: {
-				"vase": {
-					key: "vase",
-					image: "/static/img/MingVase.webp",
-					title: "300 bc vase, china",
-					currentBid: 20013
-				},
-				"stearinlys": {
-					key: "stearinlys",
-					image: "/static/img/BundleOfCandles.webp",
-					title: "Ancient bundle of candles, lightly used",
-					currentBid: 1542
-				}
-			}
-		}
-	
-		const populateSite = (auctionInventory) => {
-			marketplaceTarget.innerHTML = "";
-			auctionInventory.forEach(element => {
-				let clone = template.content.cloneNode(true);
+					<div class="bid">
+						${bid}
+					</div>
+				</section>
 
-				clone.querySelector("h3").textContent  =	element.title;
-				clone.querySelector(".bid").textContent =	(element.currentBid != null) ? `${element.currentBid},-`: '';
-				clone.querySelector("img").src =			element.image;
-				clone.querySelector("img").alt =			element.title.replace(`"`,`\"`);
-				
-				let button = clone.querySelector("button");
-				button.addEventListener('click', (event) => {
-					bidInfoModal.querySelector("#bidItem").textContent = `${element.title}`;
-					bidInfoModal.querySelector("#bidMessage #bidMessageItemID").textContent = `${element.key}`
-					bidInfoModal.showModal();
-				});
-				
-				const bidHistory = clone.querySelector(".bidHistoryContainer a");
+				<h3>${title}</h3>
 
-				bidHistory.addEventListener('click', (event) => {
-					let history = element.bids;
-					fetch(`/api/items/${element.id}/bids/`)
-					.then(r => r.json())
-					.then(items => {
-						bidHistoryMessages.innerHTML = "";
-						if (items == undefined || items.length == 0) {
-							let historyClone = document.createElement('div');
-							historyClone.textContent = 'Denne gjenstanden har ingen bud enda.';
-							bidHistoryMessages.appendChild(historyClone);
-							
-							bidHistoryModal.showModal();
-							return;
-						}
-						items.forEach(historyItem => {
-							let historyClone = bidHistoryInfoTemplate.content.cloneNode(true);
-							let humanReadableDate = new Date(historyItem.timestamp).toDateString();
-							//let humanReadableDate = new Date(element.timestamp).toUTCString();
+				<div class="bidHistoryContainer">
+					<a class="showBids">Vis Bud-Historikk</a>
 
-							historyClone.querySelector(".bidHistoryInfoCard .bidTime").textContent = `${humanReadableDate}`;
-							historyClone.querySelector(".bidHistoryInfoCard .bidSender").textContent = `${historyItem.sender}`;
-							historyClone.querySelector(".bidHistoryInfoCard .bidMoney").textContent = `${historyItem.amount} NOK`;
+					<section class="collapsed">
 
+					</section>
+				</div>
+			</div>
+		</template>
 
-							bidHistoryMessages.appendChild(historyClone);
-						});
+		<dialog id="bidModal">
+			<form method="dialog">
+				<button autofocus id="bidInfoModalClose">❌</button>
+			</form>
 
-						bidHistoryModal.showModal();
-					})
-					.catch(()=>{
-						bidHistoryMessages.innerHTML = "";
-						let historyClone = document.createElement('div');
-						historyClone.textContent = 'Denne gjenstanden har ingen bud enda.';
-						bidHistoryMessages.appendChild(historyClone);
-						
-						bidHistoryModal.showModal();
-					});
+			<h1>By på"<span id="bidItem"></span>"</h1>
 
-					
-				});
-				marketplaceTarget.appendChild(clone);
-			});
-		}
-	</script>
-</body>
+			<div id="bidMessage">
+				Send SMS med kodeord <br><span class="smsTemplate">BUD <span id="bidMessageItemID"></span> <span id="minBid">[ditt bud]</span></span><br><br>Til 27333
+			</div>
+		</dialog>
+
+		<dialog id="bidHistoryModal">
+			<form method="dialog">
+				<button autofocus id="bidHistoryModalClose">❌</button>
+			</form>
+
+			<h1>Budhistorikk</h1>
+
+			<div id="bidHistoryMessages">
+
+			</div>
+		</dialog>
+
+		<script src="script/main.js"></script>
+	</body>
 </html>
