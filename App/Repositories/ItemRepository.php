@@ -47,7 +47,7 @@ class ItemRepository extends MySqlRepository
 
         $constraintsString = $this->constraintsToSql();
 
-        $statement = $this->getPdo()->prepare("SELECT `{$this->table}`.*, MAX(`bids`.`amount`) AS `current_bid` FROM `{$this->table}`, `bids` WHERE `{$this->table}`.`{$primaryKeyColumn}` = :{$primaryKey}" . ($constraintsString ? " AND {$constraintsString}" : '') . " GROUP BY `{$this->table}`.`id`");
+        $statement = $this->getPdo()->prepare("SELECT `{$this->table}`.*, MAX(`bids`.`amount`) AS `current_bid` FROM `{$this->table}` LEFT OUTER JOIN `bids` ON `{$this->table}`.`{$primaryKeyColumn}` = `bids`.`item_id` WHERE `{$this->table}`.`{$primaryKeyColumn}` = :{$primaryKey}" . ($constraintsString ? " AND {$constraintsString}" : '') . " GROUP BY `{$this->table}`.`{$primaryKeyColumn}`");
         $statement->execute([
             ':' . $primaryKey => $id,
         ]);
@@ -61,9 +61,12 @@ class ItemRepository extends MySqlRepository
      */
     public function findByKey(string $key): ?Entity
     {
+        $primaryKey = (new $this->entityClass())->getPrimaryKeyName();
+        $primaryKeyColumn = snake_case($primaryKey);
+
         $constraintsString = $this->constraintsToSql();
 
-        $statement = $this->getPdo()->prepare("SELECT `{$this->table}`.*, MAX(`bids`.`amount`) AS `current_bid` FROM `{$this->table}`, `bids` WHERE `key` = :key" . ($constraintsString ? " AND {$constraintsString}" : '') . " GROUP BY `{$this->table}`.`id`");
+        $statement = $this->getPdo()->prepare("SELECT `{$this->table}`.*, MAX(`bids`.`amount`) AS `current_bid` FROM `{$this->table}` LEFT OUTER JOIN `bids` ON `{$this->table}`.`{$primaryKeyColumn}` = `bids`.`item_id` WHERE `{$this->table}`.`key` = :key" . ($constraintsString ? " AND {$constraintsString}" : '') . " GROUP BY `{$this->table}`.`{$primaryKeyColumn}`");
         $statement->execute([
             ':key' => $key,
         ]);
