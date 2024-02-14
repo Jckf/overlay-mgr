@@ -23,9 +23,12 @@ class ItemRepository extends MySqlRepository
     {
         $offset = ($page - 1) * $perPage;
 
+        $primaryKey = (new $this->entityClass())->getPrimaryKeyName();
+        $primaryKeyColumn = snake_case($primaryKey);
+
         $constraintsString = $this->constraintsToSql();
 
-        $statement = $this->getPdo()->prepare("SELECT `{$this->table}`.*, MAX(`bids`.`amount`) AS `current_bid` FROM `{$this->table}` LEFT OUTER JOIN `bids` ON `{$this->table}`.`id` = `bids`.`item_id`" . ($constraintsString ? " WHERE {$constraintsString}" : '') . " GROUP BY `items`.`id` LIMIT :limit OFFSET :offset");
+        $statement = $this->getPdo()->prepare("SELECT `{$this->table}`.*, MAX(`bids`.`amount`) AS `current_bid` FROM `{$this->table}` LEFT OUTER JOIN `bids` ON `{$this->table}`.`{$primaryKeyColumn}` = `bids`.`item_id`" . ($constraintsString ? " WHERE {$constraintsString}" : '') . " GROUP BY `items`.`id` LIMIT :limit OFFSET :offset");
         $statement->bindParam(':limit', $perPage, PDO::PARAM_INT);
         $statement->bindParam(':offset', $offset, PDO::PARAM_INT);
         $statement->execute();
@@ -44,7 +47,7 @@ class ItemRepository extends MySqlRepository
 
         $constraintsString = $this->constraintsToSql();
 
-        $statement = $this->getPdo()->prepare("SELECT `{$this->table}`.*, MAX(`bids`.`amount`) AS `current_bid` FROM `{$this->table}`, `bids` WHERE {$primaryKeyColumn} = :{$primaryKey}" . ($constraintsString ? " AND {$constraintsString}" : '') . " GROUP BY `{$this->table}`.`id`");
+        $statement = $this->getPdo()->prepare("SELECT `{$this->table}`.*, MAX(`bids`.`amount`) AS `current_bid` FROM `{$this->table}`, `bids` WHERE `{$this->table}`.`{$primaryKeyColumn}` = :{$primaryKey}" . ($constraintsString ? " AND {$constraintsString}" : '') . " GROUP BY `{$this->table}`.`id`");
         $statement->execute([
             ':' . $primaryKey => $id,
         ]);
@@ -65,6 +68,6 @@ class ItemRepository extends MySqlRepository
             ':key' => $key,
         ]);
 
-        return $statement->fetchObject($this->entityClass);
+        return $statement->fetchObject($this->entityClass) ?: null;
     }
 }
