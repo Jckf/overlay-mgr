@@ -14,7 +14,7 @@ $router->bind('get', '/^\/$/', function (Request $request) {
 });
 
 // SMS
-$router->bind('get', '/^\/api\/sms\/incoming$/', [ SmsController::class, 'incoming' ]);
+$router->bind('get', '/^\/api\/sms\/incoming\/' . env('SMS_SECRET', '') . '$/', [ SmsController::class, 'incoming' ]);
 
 // Items
 $router->bind('get', '/^\/api\/items\/$/', [ ItemController::class, 'index' ]);

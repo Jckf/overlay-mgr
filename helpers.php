@@ -53,3 +53,13 @@ function millitime(): int
 {
     return (int) (microtime(true) * 1000);
 }
+
+/**
+ * @param string $key
+ * @param string|null $default
+ * @return string|null
+ */
+function env(string $key, string $default = null): ?string
+{
+    return $_ENV[$key] ?? $default;
+}
