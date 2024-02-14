@@ -66,6 +66,7 @@
     background: linear-gradient(0, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0));
     font-size: 1.25em;
     padding: 0.5em;
+    position: relative;
 }
 
 /**
