@@ -2,68 +2,107 @@
 <html lang="en">
 	<head>
 		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
 
 		<title>Auksjon - Kamp mot Kreft</title>
 
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter%3Awght%40400%3B500%3B600%3B700&#038;display=swap&#038;ver=1.1.0" type="text/css">
+		<link rel="stylesheet" href="//fonts.googleapis.com/css2?family=Noto+Sans+TC%3Awght%40400%3B500%3B700&#038;display=swap&#038;ver=6.4.3" type="text/css">
+		<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato%3A300%2C400%2C700%2C900&#038;ver=6.4.3" type="text/css">
+
+		<link rel="stylesheet" href="style/doc.css">
+		<link rel="stylesheet" href="style/layout.css">
 		<link rel="stylesheet" href="style/style.css">
 	</head>
 	<body class="appContainer">
-		<main></main>
-
-		<template id="bidHistoryInfoTemplate">
-			<div class="bidHistoryInfoCard">
-				<span class="bidTime"></span> <span class="bidSender"></span>: <span class="bidMoney"></span>
+		<header>
+			<div id="header-content">
+				<a href="http://kampmotkreft.no"><h1>Kamp mot Kreft</h1></a>
 			</div>
-		</template>
+		</header>
+
+		<main>
+			<div id="header-bumper"></div>
+
+			<div id="content">
+				<div id="welcome">
+					<h2>Velkommen til auksjonen!</h2>
+					<p>Her kan du by på flotte gjenstander og samtidig støtte en god sak. Alle inntekter går til <a href="http://kreftforeningen.no">Kreftforeningen</a>.</p>
+					<p>Bud sendes inn via SMS. Se teksten ved hver gjenstand for mer informasjon.</p>
+				</div>
+
+				<div id="items"></div>
+			</div>
+
+			<div id="footer-bumper"></div>
+		</main>
+
+		<footer>
+			<div id="footer-content">
+				<p>Utviklet av <a href="http://sandstrak.it">Sandstrak IT</a> & <a href="http://flaten.it">Flaten IT</a> for <a href="http://kampmotkreft.no">Kamp mot Kreft</a> ❤️</p>
+			</div>
+		</footer>
+
+		<!-- Templates -->
 
 		<template id="itemCard">
 			<div class="itemCard">
-				<section class="pictureBid">
-					<button>Gi Bud</button>
+				<div class="image-wrapper">
+					<img>
 
-					<img src="" alt="${title}" style="width:auto;">
-
-					<div class="bid">
-						${bid}
-					</div>
-				</section>
-
-				<h3>${title}</h3>
-
-				<div class="bidHistoryContainer">
-					<a class="showBids">Vis Bud-Historikk</a>
-
-					<section class="collapsed">
-
-					</section>
+					<div class="bid historyButton"></div>
 				</div>
+
+				<div class="item-meta">
+					<h3 class="title"></h3>
+
+					<div class="description"></div>
+
+					<br>
+
+					<div>
+						Send SMS<br>
+						"bud <span class="key"></span>" etterfulgt av ditt bud<br>
+						til 27333.
+					</div>
+				</div>
+			</div>
+		</template>
+
+		<template id="bidHistoryInfoTemplate">
+			<div class="bidHistoryInfoCard">
+				<span class="bidTime"></span><br>
+				<span class="bidSender"></span>: <span class="bidMoney"></span><br>
+				<br>
 			</div>
 		</template>
 
 		<dialog id="bidModal">
 			<form method="dialog">
-				<button autofocus id="bidInfoModalClose">❌</button>
+				<button id="bidInfoModalClose">❌</button>
 			</form>
 
-			<h1>By på"<span id="bidItem"></span>"</h1>
+			<h1>By på "<span id="bidItem"></span>"</h1>
 
 			<div id="bidMessage">
-				Send SMS med kodeord <br><span class="smsTemplate">BUD <span id="bidMessageItemID"></span> <span id="minBid">[ditt bud]</span></span><br><br>Til 27333
+				Send SMS med kodeord<br>
+				<span class="smsTemplate">BUD <span id="bidMessageItemID"></span> <span id="minBid">[ditt bud]</span></span><br>
+				<br>
+				til 27333.
 			</div>
 		</dialog>
 
 		<dialog id="bidHistoryModal">
 			<form method="dialog">
-				<button autofocus id="bidHistoryModalClose">❌</button>
+				<button id="bidHistoryModalClose">❌</button>
 			</form>
 
-			<h1>Budhistorikk</h1>
+			<h1>Historikk</h1>
 
-			<div id="bidHistoryMessages">
-
-			</div>
+			<div id="bidHistoryMessages"></div>
 		</dialog>
+
+		<!-- Let's go! -->
 
 		<script src="script/main.js"></script>
 	</body>

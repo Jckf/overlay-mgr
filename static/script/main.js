@@ -1,94 +1,89 @@
-const template = document.querySelector("#itemCard");
+const itemCardTemplate = document.querySelector("#itemCard");
 const bidHistoryModal = document.querySelector("#bidHistoryModal");
 const bidHistoryInfoTemplate = document.querySelector("#bidHistoryInfoTemplate");
-const marketplaceTarget = document.querySelector(".appContainer main");
-const bidInfoModal = document.querySelector("dialog#bidModal");
+const marketplaceTarget = document.querySelector("main #items");
+const bidInfoModal = document.querySelector("#bidModal");
 const bidHistoryMessages = bidHistoryModal.querySelector("#bidHistoryMessages");
 
-fetch(`/api/items/`)
-    .then(r => r.json())
-    .then(items => populateSite(items))
-    .catch(()=>{
-        setTimeout(()=>{document.location.reload()}, 5000);
-    });
+const numberFormat = new Intl.NumberFormat('nb-NO');
 
-mockedJson = {
-    items: {
-        "vase": {
-            key: "vase",
-            image: "/static/img/MingVase.webp",
-            title: "300 bc vase, china",
-            currentBid: 20013
-        },
-        "stearinlys": {
-            key: "stearinlys",
-            image: "/static/img/BundleOfCandles.webp",
-            title: "Ancient bundle of candles, lightly used",
-            currentBid: 1542
-        }
-    }
-}
+const updateBids = () => {
+    fetch('/api/items/')
+        .then(response => response.json())
+        .then(items => populateSite(items))
+        .then(() => setTimeout(updateBids, 15 * 1000))
+        .catch(() => {
+            setTimeout(() => document.location.reload(), 5000);
+        });
+};
+
+updateBids();
 
 const populateSite = (auctionInventory) => {
-    marketplaceTarget.innerHTML = "";
-    auctionInventory.forEach(element => {
-        let clone = template.content.cloneNode(true);
+    marketplaceTarget.innerHTML = '';
 
-        clone.querySelector("h3").textContent  =	element.title;
-        clone.querySelector(".bid").textContent =	(element.currentBid != null) ? `${element.currentBid},-`: '';
-        clone.querySelector("img").src =			element.image;
-        clone.querySelector("img").alt =			element.title.replace(`"`,`\"`);
+    auctionInventory.forEach(item => {
+        let itemCard = itemCardTemplate.content.cloneNode(true);
 
-        let button = clone.querySelector("button");
-        button.addEventListener('click', (event) => {
-            bidInfoModal.querySelector("#bidItem").textContent = `${element.title}`;
-            bidInfoModal.querySelector("#bidMessage #bidMessageItemID").textContent = `${element.key}`
-            bidInfoModal.showModal();
-        });
+        itemCard.querySelector('img').src = item.image;
+        itemCard.querySelector('.title').textContent = item.title;
+        itemCard.querySelector('.description').textContent = item.description;
+        itemCard.querySelector('.key').textContent = item.key;
+        itemCard.querySelector('.bid').textContent = (item.currentBid !== null) ? numberFormat.format(item.currentBid) + ',-': '';
 
-        const bidHistory = clone.querySelector(".bidHistoryContainer a");
+        let bidButton;
+        if (bidButton = itemCard.querySelector('button')) {
+            bidButton.addEventListener('click', () => {
+                bidInfoModal.querySelector('#bidItem').textContent = item.title;
+                bidInfoModal.querySelector('#bidMessage #bidMessageItemID').textContent = item.key;
+                bidInfoModal.showModal();
+            });
+        }
 
-        bidHistory.addEventListener('click', (event) => {
-            let history = element.bids;
-            fetch(`/api/items/${element.id}/bids/`)
-                .then(r => r.json())
-                .then(items => {
-                    bidHistoryMessages.innerHTML = "";
-                    if (items == undefined || items.length == 0) {
+        let historyButton;
+        if (historyButton = itemCard.querySelector('.historyButton')) {
+            historyButton.addEventListener('click', () => {
+                fetch(`/api/items/${item.id}/bids/`)
+                    .then(response => response.json())
+                    .then(items => {
+                        bidHistoryMessages.innerHTML = '';
+
+                        if (items === undefined || items.length === 0) {
+                            let historyClone = document.createElement('div');
+                            historyClone.textContent = 'Denne gjenstanden har ingen bud enda.';
+                            bidHistoryMessages.appendChild(historyClone);
+                            bidHistoryModal.showModal();
+                            return;
+                        }
+
+                        items.forEach(bid => {
+                            let historyClone = bidHistoryInfoTemplate.content.cloneNode(true);
+
+                            const ts = new Date(bid.timestamp);
+                            const humanReadableDate = ts.toLocaleDateString();
+                            const humanReadableTime = ts.toLocaleTimeString();
+
+                            historyClone.querySelector(".bidHistoryInfoCard .bidTime").textContent = humanReadableDate + ' ' + humanReadableTime;
+                            historyClone.querySelector(".bidHistoryInfoCard .bidSender").textContent = bid.sender;
+                            historyClone.querySelector(".bidHistoryInfoCard .bidMoney").textContent = numberFormat.format(bid.amount) + ',-';
+
+
+                            bidHistoryMessages.appendChild(historyClone);
+                        });
+
+                        bidHistoryModal.showModal();
+                    })
+                    .catch(() => {
+                        bidHistoryMessages.innerHTML = '';
                         let historyClone = document.createElement('div');
                         historyClone.textContent = 'Denne gjenstanden har ingen bud enda.';
                         bidHistoryMessages.appendChild(historyClone);
 
                         bidHistoryModal.showModal();
-                        return;
-                    }
-                    items.forEach(historyItem => {
-                        let historyClone = bidHistoryInfoTemplate.content.cloneNode(true);
-                        let humanReadableDate = new Date(historyItem.timestamp).toDateString();
-                        //let humanReadableDate = new Date(element.timestamp).toUTCString();
-
-                        historyClone.querySelector(".bidHistoryInfoCard .bidTime").textContent = `${humanReadableDate}`;
-                        historyClone.querySelector(".bidHistoryInfoCard .bidSender").textContent = `${historyItem.sender}`;
-                        historyClone.querySelector(".bidHistoryInfoCard .bidMoney").textContent = `${historyItem.amount} NOK`;
-
-
-                        bidHistoryMessages.appendChild(historyClone);
                     });
+            });
+        }
 
-                    bidHistoryModal.showModal();
-                })
-                .catch(()=>{
-                    bidHistoryMessages.innerHTML = "";
-                    let historyClone = document.createElement('div');
-                    historyClone.textContent = 'Denne gjenstanden har ingen bud enda.';
-                    bidHistoryMessages.appendChild(historyClone);
-
-                    bidHistoryModal.showModal();
-                });
-
-
-        });
-
-        marketplaceTarget.appendChild(clone);
+        marketplaceTarget.appendChild(itemCard);
     });
 }

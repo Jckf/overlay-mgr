@@ -1,45 +1,76 @@
-* {
-    margin: 0;
-    padding: 0;
+#welcome {
+    padding: 1em 2em;
 }
 
-html,
-body {
-    min-width: 100vw;
-    min-height: 100vh;
+@media screen and (width <= 900px) {
+    .itemCard {
+        height: auto !important;
+    }
+
+    .image-wrapper {
+        width: 100%;
+        height: auto;
+    }
+
+    .item-meta {
+        padding-left: 1em !important;
+    }
 }
 
-.appContainer {
-    display: grid;
-    grid-template-areas: "mainContent";
-    grid-template-columns: 100vw;
-    grid-template-rows: 100vh;
+@media screen and (width <= 1180px) {
+    .itemCard {
+        height: 200px;
+    }
+
+    .item-meta {
+        padding-left: 210px;
+    }
 }
 
-.appContainer main {
-    grid-template: "mainContent";
-    display: flex;
-    flex-flow: row;
-    flex-wrap: wrap;
-    background-color: rgb(255, 109, 236);
+@media screen and (width > 1180px) {
+    .itemCard {
+        height: 300px;
+    }
+
+    .item-meta {
+        padding-left: 310px;
+    }
 }
 
 .itemCard {
     margin: 1em;
-    display: grid;
-    grid-template-areas:
-        "picture"
-        "title"
-        "history";
-    grid-template-rows: 90% 5% 5%;
-    min-width:400px;
-    height: 556px;
-    width: 400px;
-    color: #fff;
+    width: auto;
     overflow: hidden;
-    border-radius: 50px;
-    box-shadow: 0 0 5px 5px  rgba(40, 40, 40, 0.7);
+    border: 2px solid #cccccc;
+    border-radius: 1em;
 }
+
+.itemCard .image-wrapper {
+    height: 100%;
+    aspect-ratio: 1 / 1;
+    float: left;
+}
+
+.image-wrapper img {
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+}
+
+.itemCard .bid {
+    width: calc(100% - 1em);
+    height: 1.5em;
+    margin-top: -2.5em;
+    color: #ffffff;
+    font-weight: bold;
+    background: linear-gradient(0, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0));
+    font-size: 1.25em;
+    padding: 0.5em;
+}
+
+/**
+ * Old code below.
+ */
 
 .itemCard button {
     z-index: 200;
@@ -48,19 +79,7 @@ body {
     position: relative;
 }
 
-.itemCard .pictureBid {
-    grid-area: picture;
-}
-
-.itemCard h3 {
-    grid-area: title;
-    background-color: rgba(40, 40, 40, 0.7);
-    text-align: center;
-    padding-bottom: 0.7em;
-}
-
 .itemCard .bidHistoryContainer {
-    grid-area: history;
     text-align: center;
     background-color: rgba(40, 40, 40, 0.7);
 }
@@ -69,37 +88,30 @@ body {
     cursor: pointer
 }
 
-.itemCard img {
-    display: block;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    height: 100%;
-    width: 100%;
-    transform: translate(-50%, -50%);
-}
-
 .itemCard .collapsed {
     display: none;
 }
 
-.itemCard .pictureBid {
-    position: relative;
-    width: 400px;
-    height: 500px;
-    display: inline-block;
-    overflow: hidden;
+/**
+ * Modals
+ */
+
+@media screen and (width <= 600px) {
+    #bidModal,
+    #bidHistoryModal {
+        width: calc(100% - 3em);
+        height: calc(100% - 1em);
+    }
 }
 
-.itemCard .bid {
-    position: absolute;
-    z-index: 200;
-    text-align: center;
-    font-size: 4em;
-    color: #fff;
-    width: 100%;
-    bottom: 0;
-    background-color: rgba(40, 40, 40, 0.7);
+@media screen and (width > 600px) {
+    #bidModal,
+    #bidHistoryModal {
+        width: 600px;
+        height: 300px;
+        position: relative;
+        margin: 5em auto 0;
+    }
 }
 
 ::backdrop {
@@ -107,15 +119,12 @@ body {
     opacity: 0.75;
 }
 
-dialog#bidModal, dialog#bidHistoryModal {
-    position: absolute;
-    left: 33%;
-    right: 33%;
-    top: 25%;
-    height: 33%;
-    width: 33%;
-    overflow: hidden;
-    border-radius: 50px;
+#bidModal,
+#bidHistoryModal {
+    position: fixed;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    border-radius: 1em;
     box-shadow: 0 0 5px 5px  rgba(40, 40, 40, 0.7);
     padding-left: 1.5em;
     padding-right: 1.5em;
@@ -123,7 +132,8 @@ dialog#bidModal, dialog#bidHistoryModal {
     border: 0;
 }
 
-dialog button#bidInfoModalClose, dialog button#bidHistoryModalClose {
+#bidInfoModalClose,
+#bidHistoryModalClose {
     font-size: 1.5em;
     float: right;
     border: 0;
@@ -136,7 +146,7 @@ dialog button#bidInfoModalClose, dialog button#bidHistoryModalClose {
     font-weight: bold;
 }
 
-#bidMessage, #bidHistoryMessages {
+#bidMessage,
+#bidHistoryMessages {
     margin-top: 1em;
-    font-size: 1.5em;
 }
