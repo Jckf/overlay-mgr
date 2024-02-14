@@ -15,9 +15,6 @@ WORKDIR /var/www
 RUN chown -R www-data: .
 USER www-data
 
-# Copy project files.
-COPY * ./
-
 ####################
 # DEV STAGE        #
 ####################
@@ -32,7 +29,10 @@ ENTRYPOINT ["docker-dev-entrypoint"]
 # PRODUCTION STAGE #
 ####################
 
-FROM env AS prod
+FROM build AS prod
+
+# Copy project files.
+COPY --chown=www-data: . .
 
 # Install dependencies.
 RUN composer install --no-dev --no-interaction --optimize-autoloader
