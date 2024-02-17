@@ -8,7 +8,7 @@ const bidHistoryMessages = bidHistoryModal.querySelector("#bidHistoryMessages");
 const numberFormat = new Intl.NumberFormat('nb-NO');
 
 const updateBids = () => {
-    fetch('/api/items/')
+    fetch('/api/items/?limit=999')
         .then(response => response.json())
         .then(items => populateSite(items))
         .then(() => setTimeout(updateBids, 15 * 1000))
