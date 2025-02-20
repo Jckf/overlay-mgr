@@ -1,4 +1,14 @@
 ####################
+# DEPS STAGE       #
+####################
+
+FROM composer AS deps
+
+WORKDIR /var/www
+COPY composer.* .
+RUN composer install
+
+####################
 # BUILD STAGE      #
 ####################
 
@@ -6,9 +16,8 @@ FROM php:8.2-fpm AS build
 
 RUN docker-php-ext-install pdo pdo_mysql
 
-# Install Composer.
-COPY container-config/php/getcomposer.sh ./
-RUN ./getcomposer.sh && mv composer.phar /usr/local/bin/composer && rm getcomposer.sh
+# Dependencies
+COPY --from=deps /var/www/vendor /var/www/vendor
 
 # Move to project dir and drop root privileges.
 WORKDIR /var/www
@@ -21,10 +30,6 @@ USER www-data
 
 FROM build AS dev
 
-COPY container-config/php/dev-entrypoint.sh /usr/local/bin/docker-dev-entrypoint
-
-ENTRYPOINT ["docker-dev-entrypoint"]
-
 ####################
 # PRODUCTION STAGE #
 ####################
@@ -33,6 +38,3 @@ FROM build AS prod
 
 # Copy project files.
 COPY --chown=www-data: . .
-
-# Install dependencies.
-RUN composer install --no-dev --no-interaction --optimize-autoloader

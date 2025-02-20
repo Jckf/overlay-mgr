@@ -1,8 +1,10 @@
-@echo off
+#!/usr/bin/env sh
+
+set -e
 
 echo Authenticating...
 
-echo %GITHUB_ACCESS_TOKEN% | docker login ghcr.io -u jckf --password-stdin
+echo $GITHUB_ACCESS_TOKEN | docker login ghcr.io -u jckf --password-stdin
 
 echo Building Nginx image...
 
