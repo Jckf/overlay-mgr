@@ -6,13 +6,13 @@ FROM composer AS deps
 
 WORKDIR /var/www
 COPY composer.* .
-RUN composer install
+RUN composer install --ignore-platform-reqs
 
 ####################
 # BUILD STAGE      #
 ####################
 
-FROM php:8.2-fpm AS build
+FROM php:8.3-cli-alpine AS build
 
 RUN docker-php-ext-install pdo pdo_mysql
 
@@ -24,11 +24,11 @@ WORKDIR /var/www
 RUN chown -R www-data: .
 USER www-data
 
-####################
-# DEV STAGE        #
-####################
+# Install RoadRunner.
+RUN ./vendor/bin/rr get-binary
 
-FROM build AS dev
+# Define RoadRunner as the command to run when the container starts.
+CMD [ "./rr", "serve" ]
 
 ####################
 # PRODUCTION STAGE #

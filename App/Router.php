@@ -14,6 +14,13 @@ class Router
     /** @var array<class-string, Controller> */
     protected array $controllers = [];
 
+    /**
+     * @param string $method
+     * @param string $pattern
+     * @param $handler
+     * @return void
+     * @throws Exception
+     */
     public function bind(string $method, string $pattern, $handler)
     {
         $method = strtolower($method);
@@ -33,6 +40,11 @@ class Router
         $this->routes[$pattern][$method] = $handler;
     }
 
+    /**
+     * @param Request $request
+     * @return mixed
+     * @throws HttpException
+     */
     public function dispatch(Request $request)
     {
         $foundMatch = false;

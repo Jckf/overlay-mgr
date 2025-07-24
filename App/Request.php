@@ -20,10 +20,12 @@ class Request
             return $headers;
         }, []);
 
+        $data = parse_url($_SERVER['REQUEST_URI']);
+
         return (new static())
             ->setMethod($_SERVER['REQUEST_METHOD'])
-            ->setUri($_SERVER['DOCUMENT_URI'])
-            ->setQuery($_SERVER['QUERY_STRING'])
+            ->setUri($data['path'])
+            ->setQuery($data['query'] ?? '')
             ->setHeaders($headers)
             ->setBody(file_get_contents('php://input'))
             ->setGet($_GET)

@@ -24,25 +24,39 @@ class Container
         return static::$instance;
     }
 
-    /** @var array<string, string> */
+    /** @var array<string, class-string> */
     protected array $aliases = [];
 
+    /**
+     * @template T
+     * @var array<class-string<T>, T>
+     */
     protected array $instances = [];
 
+    /**
+     * @param string $alias
+     * @param string $class
+     * @return void
+     */
     public function setAlias(string $alias, string $class)
     {
         $this->aliases[$alias] = $class;
     }
 
-    public function getClass(string $classOrAlias)
+    /**
+     * @param string $classOrAlias
+     * @return string
+     */
+    public function getClass(string $classOrAlias): string
     {
         return $this->aliases[$classOrAlias] ?? $classOrAlias;
     }
 
     /**
-     * @param string $class
+     * @template T
+     * @param class-string<T> $class Class name or scalar type.
      * @param array $parameters
-     * @return mixed
+     * @return T|mixed
      */
     public function make(string $class, array $parameters = [])
     {
@@ -93,9 +107,10 @@ class Container
     }
 
     /**
+     * @template T
      * @param string $class
-     * @param object $instance
-     * @return object
+     * @param object<T> $instance
+     * @return T
      */
     public function bind(string $class, object $instance)
     {

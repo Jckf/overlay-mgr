@@ -3,9 +3,10 @@
 use App\Container;
 
 /**
- * @param string|null $class
+ * @template T
+ * @param class-string<T>|null $class
  * @param array $parameters
- * @return Container|mixed
+ * @return T|Container
  */
 function container(string $class = null, array $parameters = []): mixed
 {
