@@ -1,6 +1,9 @@
 <?php
 
 use App\Container;
+use App\HttpStatusCodes;
+use App\Response\ResponseFactory;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * @template T
@@ -27,6 +30,23 @@ function container(string $class = null, array $parameters = []): mixed
 function perform(string $class, array $parameters = []): mixed
 {
     return container($class, $parameters)();
+}
+
+/**
+ * @param string|null $body
+ * @param int $status
+ * @param array $headers
+ * @return ResponseFactory|ResponseInterface
+ */
+function response(string $body = null, int $status = HttpStatusCodes::OK, array $headers = []): ResponseFactory|ResponseInterface
+{
+    $factory = container(ResponseFactory::class);
+
+    if ($body === null) {
+        return $factory;
+    }
+
+    return $factory->createResponse($body, $status, $headers);
 }
 
 /**

@@ -1,28 +1,58 @@
 services:
   ####################
-  # Web server       #
+  # Proxy server     #
   ####################
-  nginx:
-    build:
-      context: ./
-      dockerfile: nginx.dockerfile
+  proxy:
+    image: traefik:v3.5
+    command:
+      #- "--log.level=DEBUG"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entryPoints.web.address=:80"
 
     ports:
       - "80:80"
+      - "8080:8080"
 
     volumes:
-      - ./static:/var/www/static
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
 
-    depends_on:
-      - php
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.redirect-root.rule=Path(`/`)"
+      - "traefik.http.routers.redirect-root.entrypoints=web"
+      - "traefik.http.routers.redirect-root.middlewares=redirect-to-app"
+      - "traefik.http.routers.redirect-root.service=noop@internal"
+      - "traefik.http.middlewares.redirect-to-app.redirectregex.regex=.*"
+      - "traefik.http.middlewares.redirect-to-app.redirectregex.replacement=/app/"
 
   ####################
   # App server       #
   ####################
-  php:
+  app:
     build:
       context: ./
-      dockerfile: php.dockerfile
+      dockerfile: app.dockerfile
+
+    volumes:
+      - ./static:/var/www/static
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.overlay-mgr-app.rule=PathPrefix(`/app/`)"
+      - "traefik.http.routers.overlay-mgr-app.entrypoints=web"
+      - "traefik.http.routers.overlay-mgr-app.middlewares=strip-app-prefix"
+      - "traefik.http.middlewares.strip-app-prefix.stripprefix.prefixes=/app"
+      - "traefik.http.services.overlay-mgr-app.loadbalancer.server.port=80"
+
+  ####################
+  # API server       #
+  ####################
+  api:
+    build:
+      context: ./
+      dockerfile: api.dockerfile
 
     #ports:
     #  - "8080:8080"
@@ -31,16 +61,24 @@ services:
       - .:/var/www
 
     depends_on:
-      mysql:
+      database:
         condition: service_healthy
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.overlay-mgr-api.rule=PathPrefix(`/api/`)"
+      - "traefik.http.routers.overlay-mgr-api.entrypoints=web"
+      - "traefik.http.routers.overlay-mgr-api.middlewares=strip-api-prefix"
+      - "traefik.http.middlewares.strip-api-prefix.stripprefix.prefixes=/api"
+      - "traefik.http.services.overlay-mgr-api.loadbalancer.server.port=80"
 
   ####################
   # Database server  #
   ####################
-  mysql:
+  database:
     build:
       context: ./
-      dockerfile: mysql.dockerfile
+      dockerfile: database.dockerfile
 
     environment:
       MYSQL_RANDOM_ROOT_PASSWORD: "yes"

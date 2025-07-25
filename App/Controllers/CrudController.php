@@ -4,31 +4,26 @@ namespace App\Controllers;
 
 use App\Repositories\Repository;
 use App\Request;
+use Psr\Http\Message\ResponseInterface;
 
 abstract class CrudController extends Controller
 {
     protected Repository $repository;
 
-    public function index(Request $request): void
+    public function index(Request $request): ResponseInterface
     {
-        header('Content-Type: application/json');
-
-        echo json_encode(
+        return response()->json(
             $this->repository->page(
                 $request->get('page', 1),
                 $request->get('limit', 10)
-            ),
-            JSON_PRETTY_PRINT
+            )
         );
     }
 
-    public function get(Request $request, int $id): void
+    public function get(Request $request, int $id): ResponseInterface
     {
-        header('Content-Type: application/json');
-
-        echo json_encode(
-            $this->repository->find($id),
-            JSON_PRETTY_PRINT
+        return response()->json(
+            $this->repository->find($id)
         );
     }
 }

@@ -8,10 +8,11 @@ use App\Repositories\ItemRepository;
 use App\Request;
 use App\UseCases\ParseBidMessage;
 use Exception;
+use Psr\Http\Message\ResponseInterface;
 
 class SmsController extends Controller
 {
-    public function incoming(Request $request)
+    public function incoming(Request $request): ResponseInterface
     {
         $bid = Bid::create()
             ->setRecipient($request->input('shortnumber'))
@@ -39,8 +40,8 @@ class SmsController extends Controller
             throw new Exception('Failed to save bid :(');
         }
 
-        header('Content-Type: application/json');
-
-        echo json_encode($bid, JSON_PRETTY_PRINT);
+        return response()->json(
+            $bid
+        );
     }
 }

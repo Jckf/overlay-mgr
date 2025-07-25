@@ -27,9 +27,9 @@ CREATE TABLE `bids` (
     FOREIGN KEY (`item_id`) REFERENCES `items`(`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
-INSERT INTO `items` (`key`, `title`, `description`, `image`) VALUES ('vase', 'Ming Vase', 'A beautiful Ming Vase.', '/static/img/vase.webp');
-INSERT INTO `items` (`key`, `title`, `description`, `image`) VALUES ('candles', 'Ancient Candles', 'An ancient bundle of candles.', '/static/img/candles.webp');
-INSERT INTO `items` (`key`, `title`, `description`, `image`) VALUES ('f40', 'Ferrari F40', 'The Ferrari of Ferraris.', '/static/img/ferrari.webp');
+INSERT INTO `items` (`key`, `title`, `description`, `image`) VALUES ('vase', 'Ming Vase', 'A beautiful Ming Vase.', '/app/img/vase.webp');
+INSERT INTO `items` (`key`, `title`, `description`, `image`) VALUES ('candles', 'Ancient Candles', 'An ancient bundle of candles.', '/app/img/candles.webp');
+INSERT INTO `items` (`key`, `title`, `description`, `image`) VALUES ('f40', 'Ferrari F40', 'The Ferrari of Ferraris.', '/app/img/ferrari.webp');
 
 INSERT INTO `bids` (`recipient`, `sender`, `original_message`, `item_id`, `amount`, `timestamp`) VALUES ('27333', '93613740', 'bud f40 1000 kr', 3, 1000, 1460000000000);
 INSERT INTO `bids` (`recipient`, `sender`, `original_message`, `item_id`, `amount`, `timestamp`) VALUES ('27333', '81549300', 'BUD f40 5500', 3, 5500, 1460005000000);
