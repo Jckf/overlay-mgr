@@ -9,3 +9,4 @@
 # Other files from dev env.
 /.bash_history
 /rr
+/.env
