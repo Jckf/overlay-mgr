@@ -16,18 +16,14 @@ class Router
 
     /**
      * @param string $method
-     * @param string $pattern
+     * @param string $path
      * @param $handler
      * @return void
      * @throws Exception
      */
-    public function bind(string $method, string $pattern, $handler)
+    public function bind(string $method, string $path, $handler)
     {
         $method = strtolower($method);
-
-        if (!array_key_exists($pattern, $this->routes)) {
-            $this->routes[$pattern] = [];
-        }
 
         if (is_array($handler) && is_string($handler[0])) {
             $handler[0] = $this->controllers[$handler[0]] ?? $this->controllers[$handler[0]] = container($handler[0]);
@@ -37,7 +33,27 @@ class Router
             throw new Exception('Handler must be callable.');
         }
 
-        $this->routes[$pattern][$method] = $handler;
+        $variables = [];
+
+        $branch = &$this->routes;
+
+        foreach (explode('/', $path) as $part) {
+            if (substr($part, 0, 1) == '{') {
+                $variables[] = substr($part, 1, -1);
+                $part = '$';
+            }
+
+            if (!array_key_exists($part, $branch)) {
+                $branch[$part] = [];
+            }
+
+            $branch = &$branch[$part];
+        }
+
+        $branch[$method] = [
+            'handler' => $handler,
+            'variables' => $variables,
+        ];
     }
 
     /**
@@ -47,28 +63,33 @@ class Router
      */
     public function dispatch(Request $request)
     {
-        $foundMatch = false;
+        $method = strtolower($request->getMethod());
 
-        foreach ($this->routes as $pattern => $methods) {
-            if (preg_match($pattern, $request->getUri(), $matches)) {
-                array_shift($matches);
+        $variables = [];
 
-                $foundMatch = true;
+        $branch = &$this->routes;
 
-                $method = strtolower($request->getMethod());
-
-                if (array_key_exists($method, $methods)) {
-                    $handler = $methods[$method];
-
-                    return $handler($request, ...$matches);
+        foreach (explode('/', $request->getUri()) as $part) {
+            if (!array_key_exists($part, $branch)) {
+                if (!array_key_exists('$', $branch)) {
+                    break;
                 }
+
+                $variables[] = $part;
+                $part = '$';
             }
+
+            $branch = &$branch[$part];
         }
 
-        if ($foundMatch) {
-            throw new HttpException(HttpStatusCodes::METHOD_NOT_ALLOWED, 'Method not allowed.');
+        $handler = $branch[$method]['handler'] ?? null;
+
+        // TODO: Method not allowed.
+        if (!is_callable($handler)) {
+            throw new HttpException(HttpStatusCodes::NOT_FOUND, 'Not found.');
         }
 
-        throw new HttpException(HttpStatusCodes::NOT_FOUND, 'Not found.');
+        // TODO: Match variables with method parameters.
+        return $handler($request, ... $variables);
     }
 }

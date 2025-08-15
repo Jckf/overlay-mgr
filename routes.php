@@ -9,11 +9,11 @@ use App\Router;
 $router = container(Router::class);
 
 // SMS
-$router->bind('get', '/^\/sms\/incoming\/' . env('SMS_SECRET', '') . '$/', [ SmsController::class, 'incoming' ]);
+$router->bind('get', '/sms/incoming/' . env('SMS_SECRET', ''), [ SmsController::class, 'incoming' ]);
 
 // Items
-$router->bind('get', '/^\/items\/$/', [ ItemController::class, 'index' ]);
-$router->bind('get', '/^\/items\/([0-9]+)$/', [ ItemController::class, 'get' ]);
+$router->bind('get', '/items/', [ ItemController::class, 'index' ]);
+$router->bind('get', '/items/{item}', [ ItemController::class, 'get' ]);
 
 // Item bids
-$router->bind('get', '/^\/items\/([0-9]+)\/bids\/$/', [ ItemBidController::class, 'bidIndex' ]);
+$router->bind('get', '/items/{item}/bids/', [ ItemBidController::class, 'bidIndex' ]);
