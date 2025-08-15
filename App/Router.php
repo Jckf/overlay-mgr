@@ -24,6 +24,7 @@ class Router
     public function bind(string $method, string $path, $handler)
     {
         $method = strtolower($method);
+        $path = trim($path, '/');
 
         if (is_array($handler) && is_string($handler[0])) {
             $handler[0] = $this->controllers[$handler[0]] ?? $this->controllers[$handler[0]] = container($handler[0]);
@@ -38,7 +39,7 @@ class Router
         $branch = &$this->routes;
 
         foreach (explode('/', $path) as $part) {
-            if (substr($part, 0, 1) == '{') {
+            if ($part[0] == '{') {
                 $variables[] = substr($part, 1, -1);
                 $part = '$';
             }
@@ -69,7 +70,7 @@ class Router
 
         $branch = &$this->routes;
 
-        foreach (explode('/', $request->getUri()) as $part) {
+        foreach (explode('/', trim($request->getUri(), '/')) as $part) {
             if (!array_key_exists($part, $branch)) {
                 if (!array_key_exists('$', $branch)) {
                     break;
