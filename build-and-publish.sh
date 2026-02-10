@@ -4,15 +4,15 @@ set -e
 
 echo Authenticating...
 
-echo $GITHUB_ACCESS_TOKEN | docker login ghcr.io -u jckf --password-stdin
+echo $GITHUB_ACCESS_TOKEN | docker login ghcr.io -u $GITHUB_USERNAME --password-stdin
 
 echo Building Nginx image...
 
-docker build -t overlay-mgr_nginx:latest -t ghcr.io/jckf/overlay-mgr_nginx:latest . -f nginx.dockerfile
+docker build -t overlay-mgr_nginx:latest -t ghcr.io/jckf/overlay-mgr_nginx:latest . -f app.dockerfile
 
 echo Building PHP image...
 
-docker build -t overlay-mgr_php:latest -t ghcr.io/jckf/overlay-mgr_php:latest . -f php.dockerfile
+docker build -t overlay-mgr_php:latest -t ghcr.io/jckf/overlay-mgr_php:latest . -f api.dockerfile
 
 echo Pushing images...
 
