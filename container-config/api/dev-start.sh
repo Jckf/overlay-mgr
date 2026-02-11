@@ -13,6 +13,6 @@ php -r "unlink('composer-setup.php');"
 
 php composer.phar install --ignore-platform-reqs
 
-./vendor/bin/rr get-binary
+[ -e ./rr ] || ./vendor/bin/rr get-binary
 
 ./rr serve
