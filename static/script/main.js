@@ -29,7 +29,7 @@ const populateSite = (auctionInventory) => {
         itemCard.querySelector('.title').textContent = item.title;
         itemCard.querySelector('.description').innerHTML = item.description;
         itemCard.querySelector('.key').textContent = item.key;
-        itemCard.querySelector('.bid').textContent = (item.currentBid !== null) ? numberFormat.format(item.currentBid) + ',-': '';
+        itemCard.querySelector('.bid').textContent = (item.currentBid !== null) ? numberFormat.format(item.currentBid) + ',-': 'Ingen bud';
 
         let bidButton;
         if (bidButton = itemCard.querySelector('button')) {
