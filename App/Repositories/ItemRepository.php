@@ -28,12 +28,13 @@ class ItemRepository extends MySqlRepository
 
         $constraintsString = $this->constraintsToSql();
 
-        $statement = $this->getPdo()->prepare("SELECT `{$this->table}`.*, MAX(`bids`.`amount`) AS `current_bid` FROM `{$this->table}` LEFT OUTER JOIN `bids` ON `{$this->table}`.`{$primaryKeyColumn}` = `bids`.`item_id`" . ($constraintsString ? " WHERE {$constraintsString}" : '') . " GROUP BY `items`.`id` LIMIT :limit OFFSET :offset");
-        $statement->bindParam(':limit', $perPage, PDO::PARAM_INT);
-        $statement->bindParam(':offset', $offset, PDO::PARAM_INT);
-        $statement->execute();
+        $statement = $this->database->prepare("SELECT `{$this->table}`.*, MAX(`bids`.`amount`) AS `current_bid` FROM `{$this->table}` LEFT OUTER JOIN `bids` ON `{$this->table}`.`{$primaryKeyColumn}` = `bids`.`item_id`" . ($constraintsString ? " WHERE {$constraintsString}" : '') . " GROUP BY `items`.`id` LIMIT :limit OFFSET :offset");
+        $statement->execute([
+            ':limit' => $perPage,
+            ':offset' => $offset,
+        ]);
 
-        return $statement->fetchAll(PDO::FETCH_CLASS, $this->entityClass);
+        return $statement->fetchAll($this->entityClass);
     }
 
     /**
@@ -47,12 +48,12 @@ class ItemRepository extends MySqlRepository
 
         $constraintsString = $this->constraintsToSql();
 
-        $statement = $this->getPdo()->prepare("SELECT `{$this->table}`.*, MAX(`bids`.`amount`) AS `current_bid` FROM `{$this->table}` LEFT OUTER JOIN `bids` ON `{$this->table}`.`{$primaryKeyColumn}` = `bids`.`item_id` WHERE `{$this->table}`.`{$primaryKeyColumn}` = :{$primaryKey}" . ($constraintsString ? " AND {$constraintsString}" : '') . " GROUP BY `{$this->table}`.`{$primaryKeyColumn}`");
+        $statement = $this->database->prepare("SELECT `{$this->table}`.*, MAX(`bids`.`amount`) AS `current_bid` FROM `{$this->table}` LEFT OUTER JOIN `bids` ON `{$this->table}`.`{$primaryKeyColumn}` = `bids`.`item_id` WHERE `{$this->table}`.`{$primaryKeyColumn}` = :{$primaryKey}" . ($constraintsString ? " AND {$constraintsString}" : '') . " GROUP BY `{$this->table}`.`{$primaryKeyColumn}`");
         $statement->execute([
             ':' . $primaryKey => $id,
         ]);
 
-        return $statement->fetchObject($this->entityClass);
+        return $statement->fetch($this->entityClass);
     }
 
     /**
@@ -66,11 +67,11 @@ class ItemRepository extends MySqlRepository
 
         $constraintsString = $this->constraintsToSql();
 
-        $statement = $this->getPdo()->prepare("SELECT `{$this->table}`.*, MAX(`bids`.`amount`) AS `current_bid` FROM `{$this->table}` LEFT OUTER JOIN `bids` ON `{$this->table}`.`{$primaryKeyColumn}` = `bids`.`item_id` WHERE `{$this->table}`.`key` = :key" . ($constraintsString ? " AND {$constraintsString}" : '') . " GROUP BY `{$this->table}`.`{$primaryKeyColumn}`");
+        $statement = $this->database->prepare("SELECT `{$this->table}`.*, MAX(`bids`.`amount`) AS `current_bid` FROM `{$this->table}` LEFT OUTER JOIN `bids` ON `{$this->table}`.`{$primaryKeyColumn}` = `bids`.`item_id` WHERE `{$this->table}`.`key` = :key" . ($constraintsString ? " AND {$constraintsString}" : '') . " GROUP BY `{$this->table}`.`{$primaryKeyColumn}`");
         $statement->execute([
             ':key' => $key,
         ]);
 
-        return $statement->fetchObject($this->entityClass) ?: null;
+        return $statement->fetch($this->entityClass) ?: null;
     }
 }

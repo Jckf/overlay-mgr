@@ -108,17 +108,21 @@ class Container
 
     /**
      * @template T
-     * @param string $class
+     * @param class-string|class-string[] $class
      * @param object<T> $instance
      * @return T
      */
-    public function bind(string $class, object $instance)
+    public function bind(string|array $class, object $instance)
     {
-        return $this->instances[$class] = $instance;
+        foreach ((array) $class as $abstract) {
+            $this->instances[$abstract] = $instance;
+        }
+
+        return $instance;
     }
 
     /**
-     * @param string $class
+     * @param class-string $class
      */
     public function unbind(string $class)
     {

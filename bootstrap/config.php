@@ -1,10 +1,17 @@
 <?php
 
-use App\Repositories\MySqlRepository;
+declare(strict_types=1);
 
-$pdo = new PDO('mysql:host=' . env('DB_HOST', 'database') . ';port=' . env('DB_PORT', 3306) . ';dbname=' . env('DB_NAME', 'overlay-mgr'), env('DB_USER', 'overlay-mgr'), env('DB_PASS', 'overlay-mgr'));
+use App\Database\Database;
+use App\Database\MySqlDatabase;
 
-$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-$pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-
-MySqlRepository::setPdo($pdo);
+container()->bind(
+    [ Database::class, MySqlDatabase::class ],
+    new MySqlDatabase(
+        env('DB_HOST', 'database'),
+        (int) env('DB_PORT', '3306'),
+        env('DB_NAME', 'overlay-mgr'),
+        env('DB_USER', 'overlay-mgr'),
+        env('DB_PASS', 'overlay-mgr')
+    )
+);

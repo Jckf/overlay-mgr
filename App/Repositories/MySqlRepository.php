@@ -2,21 +2,14 @@
 
 namespace App\Repositories;
 
+use App\Database\MySqlDatabase;
 use App\Entities\Entity;
 use PDO;
 
 class MySqlRepository implements Repository
 {
-    /** @var PDO */
-    protected static PDO $pdo;
-
-    /**
-     * @param PDO $pdo
-     */
-    public static function setPdo(PDO $pdo)
-    {
-        self::$pdo = $pdo;
-    }
+    /** @var MySqlDatabase */
+    protected MySqlDatabase $database;
 
     /** @var string */
     protected string $table;
@@ -28,11 +21,11 @@ class MySqlRepository implements Repository
     protected array $constraints = [];
 
     /**
-     * @return PDO
+     * @param MySqlDatabase $database
      */
-    protected function getPdo(): PDO
+    public function __construct(MySqlDatabase $database)
     {
-        return self::$pdo;
+        $this->database = $database;
     }
 
     /**
@@ -54,13 +47,13 @@ class MySqlRepository implements Repository
         $columnsString = implode(', ', $columns);
         $placeholdersString = implode(', ', $placeholders);
 
-        $statement = $this->getPdo()->prepare("INSERT INTO {$this->table} ({$columnsString}) VALUES ({$placeholdersString})");
+        $statement = $this->database->prepare("INSERT INTO {$this->table} ({$columnsString}) VALUES ({$placeholdersString})");
 
         if (!$statement->execute($values)) {
             return false;
         }
 
-        $entity->setAttribute($entity->getPrimaryKeyName(), $this->getPdo()->lastInsertId());
+        $entity->setAttribute($entity->getPrimaryKeyName(), $this->database->lastInsertId());
 
         return true;
     }
@@ -87,7 +80,8 @@ class MySqlRepository implements Repository
 
         $columnsString = implode(', ', $columns);
 
-        $statement = $this->getPdo()->prepare("UPDATE {$this->table} SET {$columnsString} WHERE {$primaryKeyColumn} = :{$primaryKey}");
+        $statement = $this->database->prepare("UPDATE {$this->table} SET {$columnsString} WHERE {$primaryKeyColumn} = :{$primaryKey}");
+
         return $statement->execute($values);
     }
 
@@ -115,7 +109,8 @@ class MySqlRepository implements Repository
 
         $constraintsString = $this->constraintsToSql();
 
-        $statement = $this->getPdo()->prepare("DELETE FROM {$this->table} WHERE {$primaryKeyColumn} = :{$primaryKey}" . ($constraintsString ? " AND {$constraintsString}" : ''));
+        $statement = $this->database->prepare("DELETE FROM {$this->table} WHERE {$primaryKeyColumn} = :{$primaryKey}" . ($constraintsString ? " AND {$constraintsString}" : ''));
+
         return $statement->execute([
             ':' . $primaryKey => $entity->getAttribute($primaryKey),
         ]);
@@ -134,12 +129,13 @@ class MySqlRepository implements Repository
 
         $constraintsString = $this->constraintsToSql();
 
-        $statement = $this->getPdo()->prepare("SELECT * FROM {$this->table}" . ($constraintsString ? " WHERE {$constraintsString}" : '') . " ORDER BY `{$orderBy}` {$direction} LIMIT :limit OFFSET :offset");
-        $statement->bindParam(':limit', $perPage, PDO::PARAM_INT);
-        $statement->bindParam(':offset', $offset, PDO::PARAM_INT);
-        $statement->execute();
+        $statement = $this->database->prepare("SELECT * FROM {$this->table}" . ($constraintsString ? " WHERE {$constraintsString}" : '') . " ORDER BY `{$orderBy}` {$direction} LIMIT :limit OFFSET :offset");
+        $statement->execute([
+            ':limit' => $perPage,
+            ':offset' => $offset,
+        ]);
 
-        return $statement->fetchAll(PDO::FETCH_CLASS, $this->entityClass);
+        return $statement->fetchAll($this->entityClass);
     }
 
     /**
@@ -153,12 +149,12 @@ class MySqlRepository implements Repository
 
         $constraintsString = $this->constraintsToSql();
 
-        $statement = $this->getPdo()->prepare("SELECT * FROM {$this->table} WHERE {$primaryKeyColumn} = :{$primaryKey}" . ($constraintsString ? " AND {$constraintsString}" : ''));
+        $statement = $this->database->prepare("SELECT * FROM {$this->table} WHERE {$primaryKeyColumn} = :{$primaryKey}" . ($constraintsString ? " AND {$constraintsString}" : ''));
         $statement->execute([
             ':' . $primaryKey => $id,
         ]);
 
-        return $statement->fetchObject($this->entityClass);
+        return $statement->fetch($this->entityClass);
     }
 
     /**
