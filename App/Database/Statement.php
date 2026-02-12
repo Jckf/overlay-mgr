@@ -13,9 +13,9 @@ interface Statement
     /**
      * @template T
      * @param class-string<T> $class
-     * @return T|null
+     * @return T|false|null
      */
-    function fetch(string $class = stdClass::class): ?object;
+    function fetch(string $class = stdClass::class): object|false|null;
 
     /**
      * @template T

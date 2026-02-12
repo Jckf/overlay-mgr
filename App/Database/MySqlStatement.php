@@ -53,7 +53,7 @@ class MySqlStatement implements Statement
         }
     }
 
-    function fetch(string $class = stdClass::class): ?object
+    function fetch(string $class = stdClass::class): object|false|null
     {
         if (!$this->pdoStatement) {
             throw new Exception("Not executed!");

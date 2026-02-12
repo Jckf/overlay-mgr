@@ -37,6 +37,8 @@ interface Repository
      * @param string $attribute
      * @param string $operator
      * @param mixed $value
+     * @deprecated This gives the repository state, which will leak between requests.
+     * @todo Redesign to get rid of state.
      */
     public function constrain(string $attribute, string $operator, mixed $value): void;
 }

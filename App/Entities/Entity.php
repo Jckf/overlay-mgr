@@ -8,8 +8,8 @@ use ReflectionClass;
 
 abstract class Entity implements JsonSerializable
 {
-    /** @var string[]|null */
-    protected static ?array $attributes = null;
+    /** @var array<string, string[]> */
+    protected static ?array $attributes = [];
 
     /**
      * @return static
@@ -61,8 +61,8 @@ abstract class Entity implements JsonSerializable
      */
     public function getAttributes(): array
     {
-        if (!static::$attributes) {
-            static::$attributes = [];
+        if (empty(static::$attributes[static::class])) {
+            static::$attributes[static::class] = [];
 
             $reflectionClass = new ReflectionClass($this);
 
@@ -71,11 +71,11 @@ abstract class Entity implements JsonSerializable
                     continue;
                 }
 
-                static::$attributes[] = $reflectionProperty->getName();
+                static::$attributes[static::class][] = $reflectionProperty->getName();
             }
         }
 
-        return static::$attributes;
+        return static::$attributes[static::class];
     }
 
     /**

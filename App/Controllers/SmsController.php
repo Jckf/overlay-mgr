@@ -12,6 +12,16 @@ use Psr\Http\Message\ResponseInterface;
 
 class SmsController extends Controller
 {
+    protected ItemRepository $itemRepository;
+
+    protected BidRepository $bidRepository;
+
+    public function __construct(ItemRepository $itemRepository, BidRepository $bidRepository)
+    {
+        $this->itemRepository = $itemRepository;
+        $this->bidRepository = $bidRepository;
+    }
+
     public function incoming(Request $request): ResponseInterface
     {
         $bid = Bid::create()
@@ -26,17 +36,11 @@ class SmsController extends Controller
 
         $bid->setAmount($bidMeta['amount']);
 
-        /** @var ItemRepository $itemRepo */
-        $itemRepo = container(ItemRepository::class);
-
-        if ($item = $itemRepo->findByKey($bidMeta['item_key'])) {
+        if ($item = $this->itemRepository->findByKey($bidMeta['item_key'])) {
             $bid->setItemId($item->getId());
         }
 
-        /** @var BidRepository $bidRepo */
-        $bidRepo = container(BidRepository::class);
-
-        if (!$bidRepo->save($bid)) {
+        if (!$this->bidRepository->save($bid)) {
             throw new Exception('Failed to save bid :(');
         }
 
