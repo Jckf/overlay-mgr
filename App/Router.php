@@ -51,7 +51,7 @@ class Router
             $branch = &$branch[$part];
         }
 
-        $branch[$method] = [
+        $branch['_' . $method] = [
             'handler' => $handler,
             'variables' => $variables,
         ];
@@ -73,7 +73,7 @@ class Router
         foreach (explode('/', trim($request->getUri(), '/')) as $part) {
             if (!array_key_exists($part, $branch)) {
                 if (!array_key_exists('$', $branch)) {
-                    break;
+                    throw new HttpException(HttpStatusCodes::NOT_FOUND, 'Not found.');
                 }
 
                 $variables[] = $part;
@@ -83,7 +83,7 @@ class Router
             $branch = &$branch[$part];
         }
 
-        $handler = $branch[$method]['handler'] ?? null;
+        $handler = $branch['_' . $method]['handler'] ?? null;
 
         // TODO: Method not allowed.
         if (!is_callable($handler)) {
