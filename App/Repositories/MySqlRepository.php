@@ -163,13 +163,26 @@ class MySqlRepository implements Repository
      * @param mixed $value
      * @deprecated Constraints are vulnerable to SQL injection attacks.
      */
-    public function constrain(string $attribute, string $operator, mixed $value): void
+    public function constrain(string $attribute, string $operator, mixed $value): int
     {
-        $this->constraints[] = [
+        $id = count($this->constraints) - 1;
+
+        $this->constraints[$id] = [
             'attribute' => $attribute,
             'operator' => $operator,
             'value' => $value,
         ];
+
+        return $id;
+    }
+
+    /**
+     * @param int $id
+     * @return void
+     */
+    public function removeConstraint(int $id): void
+    {
+        unset($this->constraints[$id]);
     }
 
     /**

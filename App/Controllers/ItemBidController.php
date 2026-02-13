@@ -15,14 +15,18 @@ class ItemBidController extends CrudController
 
     public function bidIndex(Request $request, int $itemId): ResponseInterface
     {
-        $this->repository->constrain('itemId', '=', $itemId);
+        $constraintId = $this->repository->constrain('itemId', '=', $itemId);
 
-        return response()->json(
-            $this->repository->page(
-                $request->get('page', 1),
-                $request->get('limit', 10),
-                'amount',
-            )
-        );
+        try {
+            return response()->json(
+                $this->repository->page(
+                    $request->get('page', 1),
+                    $request->get('limit', 10),
+                    'amount',
+                )
+            );
+        } finally {
+            $this->repository->removeConstraint($constraintId);
+        }
     }
 }
